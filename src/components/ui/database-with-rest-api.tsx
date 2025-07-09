@@ -1,4 +1,3 @@
-
 "use client";
 
 import React from "react";
@@ -241,26 +240,26 @@ const DatabaseWithRestApi = ({
         {/* bottom shadow */}
         <div className="absolute -bottom-4 h-[100px] w-[62%] rounded-lg bg-accent/30" />
         {/* box title */}
-        <div className="absolute -top-3 z-20 flex items-center justify-center rounded-lg border bg-[#101112] px-2 py-1 sm:-top-4 sm:py-1.5">
+        <div className="absolute -top-3 z-20 flex items-center justify-center rounded-lg border bg-[#101112] px-2 py-1 sm:-top-4 sm:py-1.5 max-w-[90%] text-center">
           <SparklesIcon className="size-3" />
-          <span className="ml-2 text-[10px]">
+          <span className="ml-2 text-[9px] sm:text-[10px] max-w-[160px] sm:max-w-[220px] font-medium leading-tight break-words whitespace-pre-line block">
             {title ? title : "Data exchange using a customized REST API"}
           </span>
         </div>
         {/* box outter circle */}
-        <div className="absolute -bottom-8 z-30 grid h-[60px] w-[60px] place-items-center rounded-full border-t bg-[#141516] font-semibold text-xs">
+        <div className="absolute -bottom-8 z-30 grid h-[60px] w-[60px] place-items-center rounded-full border-t bg-[#141516] font-semibold text-[10px] sm:text-xs text-center break-words whitespace-pre-line">
           {circleText ? circleText : "SVG"}
         </div>
         {/* box content */}
         <div className="relative z-10 flex h-[150px] w-full items-center justify-center overflow-hidden rounded-lg border bg-background shadow-md">
           {/* Badges */}
-          <div className="absolute bottom-8 left-12 z-10 h-7 rounded-full bg-[#101112] px-3 text-xs border flex items-center gap-2 ">
+          <div className="absolute bottom-8 left-12 z-10 h-auto min-h-[28px] rounded-full bg-[#101112] px-3 py-1 text-[10px] sm:text-xs border flex items-center gap-2 max-w-[110px] sm:max-w-[140px] text-center break-words whitespace-pre-line">
             <HeartHandshakeIcon className="size-4" />
-            <span>{buttonTexts?.first || "LegionDev"}</span>
+            <span className="break-words whitespace-pre-line block">{buttonTexts?.first || "LegionDev"}</span>
           </div>
-          <div className="absolute right-16 z-10 hidden h-7 rounded-full bg-[#101112] px-3 text-xs sm:flex border items-center gap-2">
+          <div className="absolute right-16 z-10 hidden h-auto min-h-[28px] rounded-full bg-[#101112] px-3 py-1 text-[10px] sm:text-xs sm:flex border items-center gap-2 max-w-[110px] sm:max-w-[140px] text-center break-words whitespace-pre-line">
             <Folder className="size-4" />
-            <span>{buttonTexts?.second || "v2_updates"}</span>
+            <span className="break-words whitespace-pre-line block">{buttonTexts?.second || "v2_updates"}</span>
           </div>
           {/* Circles */}
           <motion.div

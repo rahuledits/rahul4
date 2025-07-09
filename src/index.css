@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -91,6 +90,22 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Moonrock Font - Local File */
+@font-face {
+  font-family: 'Moonrock';
+  src: url('/font/moonrock.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Fallback for Moonrock font */
+.font-moonrock {
+  font-family: 'Moonrock', 'Arial Black', 'Impact', sans-serif;
+  font-weight: normal;
+  letter-spacing: -0.02em;
 }
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. */

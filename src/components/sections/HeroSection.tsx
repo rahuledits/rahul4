@@ -23,10 +23,10 @@ const HeroSection = ({
       {/* Animated 'RAHUL' heading centered at the top with extra space */}
       <div className="absolute top-8 left-1/2 transform -translate-x-1/2 z-10 mt-16">
         <motion.h1
-          initial={{ opacity: 0, y: -40 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, y: -40, scale: 0.7 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
-          className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tighter bg-gradient-to-br from-red-800 via-red-600 to-red-500 bg-clip-text text-transparent drop-shadow-2xl"
+          className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tighter bg-gradient-to-br from-red-800 via-red-500 to-orange-400 bg-clip-text text-transparent drop-shadow-2xl hero-star-dock"
         >
           {"RAHUL".split("").map((letter, i) => (
             <motion.span

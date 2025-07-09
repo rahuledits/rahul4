@@ -46,15 +46,22 @@ const ServicesSection = ({
             <div className="absolute -inset-3 bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-xl animate-pulse" />
             
             <div className={`relative p-10 rounded-2xl ${isDarkMode ? 'bg-gray-900/60 border-gray-700/40' : 'bg-white/60 border-gray-200/40'} backdrop-blur-xl border-2 transition-all duration-700 hover:scale-105 shadow-2xl hover:shadow-purple-500/25`}>
-              <DatabaseWithRestApi title="Creative Video Processing Engine" circleText="VFX" badgeTexts={{
-              first: "COLOR",
-              second: "MOTION",
-              third: "EFFECTS",
-              fourth: "COMPOSITE"
-            }} buttonTexts={{
-              first: "CreativeStudio",
-              second: "v4_premium"
-            }} lightColor={isDarkMode ? "#FF6B9D" : "#EC4899"} className="hover:scale-110 transition-transform duration-700" />
+              <DatabaseWithRestApi 
+                title="Pro Video Suite"
+                circleText="PRO VFX"
+                badgeTexts={{
+                  first: "Color",
+                  second: "Motion",
+                  third: "FX",
+                  fourth: "Comp"
+                }}
+                buttonTexts={{
+                  first: "Demo",
+                  second: "Features"
+                }}
+                lightColor={isDarkMode ? "#FF6B9D" : "#EC4899"}
+                className="hover:scale-110 transition-transform duration-700"
+              />
             </div>
           </div>
         </div>
