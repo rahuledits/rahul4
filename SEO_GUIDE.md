@@ -150,3 +150,40 @@ Focus on these keywords in your content:
 - [ ] Optimize images for web
 - [ ] Test mobile responsiveness
 - [ ] Monitor search console for errors 
+
+---
+
+## **How to Fix: Enable SPA Routing**
+
+### **If you are using Netlify:**
+1. In your project’s `public` folder, create a file called `_redirects` (no extension).
+2. Add this line to the file:
+   ```
+   /*    /index.html   200
+   ```
+3. Deploy your site again.
+
+### **If you are using Vercel:**
+- Add a `vercel.json` file with the following:
+  ```json
+  {
+    "rewrites": [
+      { "source": "/(.*)", "destination": "/" }
+    ]
+  }
+  ```
+
+### **If you are using your own server:**
+- Make sure all unknown routes serve `index.html`.
+
+---
+
+## **Test After Fixing**
+1. Deploy your changes.
+2. Visit `https://itsrahuledits.live/contact` directly in your browser.  
+   - If you see your site (not a 404), it’s fixed!
+3. Go back to Google Search Console and **Request Indexing** again.
+
+---
+
+**Let me know which hosting provider you use (Netlify, Vercel, etc.) if you want exact step-by-step instructions!** 
