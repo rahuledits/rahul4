@@ -13,35 +13,35 @@ const TestimonialsSection = () => {
     designation: "Chief Marketing Officer",
     company: "TechCorp Solutions",
     location: "Mumbai, India",
-    src: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=500&h=500&fit=crop&crop=face"
+    src: "/3t.jpeg"
   }, {
     quote: "Working with Rahul was a game-changer for our music video production. His technical skills and creative vision delivered a final product that perfectly captured our artistic direction and resonated with our audience.",
     name: "Arjun Patel",
     designation: "Senior Producer",
     company: "Bollywood Records",
     location: "Delhi, India",
-    src: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&h=500&fit=crop&crop=face"
+    src: "/2t.jpeg"
   }, {
     quote: "Rahul's documentary work demonstrates exceptional storytelling capabilities. His ability to capture authentic moments and weave them into compelling narratives has significantly enhanced our brand's market presence.",
     name: "Anjali Desai",
     designation: "Director of Communications",
     company: "InnovateTech",
     location: "Bangalore, India",
-    src: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=500&h=500&fit=crop&crop=face"
+    src: "/1t.jpeg"
   }, {
     quote: "The integration of AI-enhanced motion graphics in our promotional content was executed flawlessly. Rahul's innovative approach to video editing has positioned us as industry leaders in digital marketing.",
     name: "Rajesh Kumar",
     designation: "Creative Director",
     company: "Digital Dynamics",
     location: "Hyderabad, India",
-    src: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500&h=500&fit=crop&crop=face"
+    src: "/4t.jpeg"
   }, {
     quote: "Rahul's cinematography and post-production expertise elevated our event coverage to cinematic standards. His work consistently delivers exceptional quality that exceeds industry benchmarks.",
     name: "Meera Singh",
     designation: "Executive Producer",
     company: "Cinema Studios",
     location: "Chennai, India",
-    src: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=500&h=500&fit=crop&crop=face"
+    src: "/5t.jpeg"
   }];
 
   return (

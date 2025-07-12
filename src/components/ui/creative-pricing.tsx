@@ -61,6 +61,7 @@ function CreativePricing({
                             color="#8b5cf6"
                             radius={200}
                         >
+                            {/* Remove extra scaling/highlighting for 'Professional' popular tier on home page */}
                             {tier.popular && (
                                 <div className="absolute -top-2 -right-2 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold px-3 py-1 rounded-full text-sm z-10">
                                     Popular!

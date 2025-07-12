@@ -18,6 +18,7 @@ type ParticlesProps = {
   speed?: number;
   particleColor?: string;
   particleDensity?: number;
+  fpsLimit?: number;
 };
 
 export const SparklesCore = (props: ParticlesProps) => {
@@ -30,6 +31,7 @@ export const SparklesCore = (props: ParticlesProps) => {
     speed,
     particleColor,
     particleDensity,
+    fpsLimit,
   } = props;
   const [init, setInit] = useState(false);
   useEffect(() => {
@@ -70,7 +72,7 @@ export const SparklesCore = (props: ParticlesProps) => {
               enable: false,
               zIndex: 1,
             },
-            fpsLimit: 120,
+            fpsLimit: fpsLimit || 120,
             interactivity: {
               events: {
                 onClick: {

@@ -67,7 +67,7 @@ function Footerdemo({
               <p>Mumbai, India</p>
               <p>NIT Nagpur Student</p>
               <p>Video Editor & Cinematographer</p>
-              <p>Email: jirahulmeena@gmail.com</p>
+              <p>jirahulmeena@gmail.com</p>
             </address>
           </div>
           <div className="relative">
