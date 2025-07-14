@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Mail, 
@@ -94,13 +94,84 @@ const budgetRangesUSD = [
   "Let's discuss"
 ];
 
+// Restore packageInfo object for all project types
+const packageInfo = {
+  "Basic Edit": {
+    priceUSD: 19.99,
+    priceINR: 1699,
+    duration: "2-3 days",
+    gradient: "from-blue-500 to-cyan-500"
+  },
+  "Professional": {
+    priceUSD: 69.99,
+    priceINR: 5999,
+    duration: "3-5 days",
+    gradient: "from-orange-500 to-pink-500"
+  },
+  "Cinematic": {
+    priceUSD: 149.99,
+    priceINR: 12999,
+    duration: "5-7 days",
+    gradient: "from-purple-500 to-indigo-500"
+  },
+  "Music Video": {
+    priceUSD: 49.99,
+    priceINR: 4199,
+    duration: "3-5 days",
+    gradient: "from-pink-500 to-yellow-500"
+  },
+  "Commercial/Ad": {
+    priceUSD: 89.99,
+    priceINR: 7499,
+    duration: "4-6 days",
+    gradient: "from-green-500 to-blue-500"
+  },
+  "Wedding Video": {
+    priceUSD: 119.99,
+    priceINR: 9999,
+    duration: "5-7 days",
+    gradient: "from-red-500 to-pink-500"
+  },
+  "Corporate Video": {
+    priceUSD: 99.99,
+    priceINR: 8299,
+    duration: "4-6 days",
+    gradient: "from-blue-700 to-gray-400"
+  },
+  "Short Film": {
+    priceUSD: 79.99,
+    priceINR: 6499,
+    duration: "4-7 days",
+    gradient: "from-purple-700 to-pink-400"
+  },
+  "Social Media Content": {
+    priceUSD: 29.99,
+    priceINR: 2499,
+    duration: "2-4 days",
+    gradient: "from-yellow-400 to-pink-400"
+  },
+  "Event Coverage": {
+    priceUSD: 59.99,
+    priceINR: 5199,
+    duration: "3-5 days",
+    gradient: "from-indigo-500 to-green-400"
+  },
+  "Other": {
+    priceUSD: 39.99,
+    priceINR: 3299,
+    duration: "3-5 days",
+    gradient: "from-gray-500 to-gray-300"
+  }
+};
+
+// Add price fields to optionalServices
 const optionalServices = [
   {
     id: 'rushDelivery',
     title: "Rush Delivery",
     description: "Get your project completed in 24-48 hours",
-    priceUSD: "+40% of package price",
-    priceINR: "+40% of package price",
+    priceUSD: 0.4, // 40% of base price
+    priceINR: 0.4,
     icon: ZapIcon,
     gradient: "from-orange-500/20 to-red-500/20"
   },
@@ -108,8 +179,8 @@ const optionalServices = [
     id: 'additionalRevisions',
     title: "Additional Revisions",
     description: "Beyond the included revisions",
-    priceUSD: "+15% of package price",
-    priceINR: "+15% of package price",
+    priceUSD: 0.15, // 15% of base price
+    priceINR: 0.15,
     icon: Plus,
     gradient: "from-blue-500/20 to-cyan-500/20"
   },
@@ -117,8 +188,8 @@ const optionalServices = [
     id: 'customMusic',
     title: "Custom Music",
     description: "Original soundtrack composition",
-    priceUSD: "+60% of package price",
-    priceINR: "+60% of package price",
+    priceUSD: 0.6, // 60% of base price
+    priceINR: 0.6,
     icon: Music,
     gradient: "from-purple-500/20 to-pink-500/20"
   },
@@ -126,12 +197,101 @@ const optionalServices = [
     id: 'extraFormats',
     title: "Extra Formats",
     description: "Multiple aspect ratios for different platforms",
-    priceUSD: "+20% of package price",
-    priceINR: "+20% of package price",
+    priceUSD: 0.2, // 20% of base price
+    priceINR: 0.2,
     icon: FileVideo,
     gradient: "from-green-500/20 to-emerald-500/20"
   }
 ];
+
+// 1. Add plan options
+const planOptions = [
+  "Basic Edit",
+  "Professional",
+  "Cinematic"
+];
+
+const fadeInUp = {
+  hidden: { opacity: 0, y: 60 },
+  visible: { 
+    opacity: 1, 
+    y: 0
+  }
+};
+
+// Memoized Optional Service Card
+const OptionalServiceCard = memo(function OptionalServiceCard({ service, selected, onToggle, currency }: any) {
+  return (
+    <motion.div
+      className={`relative p-4 rounded-xl border transition-all cursor-pointer group ${
+        selected
+          ? 'bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border-indigo-400/50'
+          : 'bg-gray-50 dark:bg-white/[0.05] border-gray-200 dark:border-white/[0.15] hover:bg-gray-100 dark:hover:bg-white/[0.08]'
+      }`}
+      onClick={() => onToggle(service.id)}
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+    >
+      <div className="flex items-start gap-3">
+        <motion.div
+          className={`w-10 h-10 rounded-lg bg-gradient-to-br ${service.gradient} border border-white/20 flex items-center justify-center flex-shrink-0`}
+          whileHover={{ scale: 1.1, rotateY: 180 }}
+          transition={{ duration: 0.6 }}
+        >
+          <service.icon className="w-5 h-5 text-white" />
+        </motion.div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between mb-1">
+            <h5 className="text-gray-900 dark:text-white font-medium text-sm">{service.title}</h5>
+            <motion.div
+              className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                selected ? 'bg-indigo-500 border-indigo-500' : 'border-white/30'
+              }`}
+              animate={{
+                scale: selected ? [1, 1.2, 1] : 1
+              }}
+              transition={{ duration: 0.2 }}
+            >
+              {selected && <CheckCircle className="w-3 h-3 text-white" />}
+            </motion.div>
+          </div>
+          <p className="text-gray-600 dark:text-white/60 text-xs mb-2">{service.description}</p>
+          <p className="text-indigo-600 dark:text-indigo-300 text-xs font-medium">
+            {currency === 'USD' ? service.priceUSD : service.priceINR}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+});
+
+// Memoized Contact Method Card
+const ContactMethodCard = memo(function ContactMethodCard({ method }: any) {
+  return (
+    <motion.a
+      href={method.link}
+      className="block p-6 bg-gray-50 dark:bg-white/[0.05] backdrop-blur-xl rounded-2xl border border-gray-200 dark:border-white/[0.15] hover:bg-gray-100 dark:hover:bg-white/[0.08] transition-all group"
+      variants={fadeInUp}
+      whileHover={{ scale: 1.02, y: -2 }}
+    >
+      <div className="flex items-center gap-4">
+        <motion.div
+          className={`w-14 h-14 rounded-xl bg-gradient-to-br ${method.gradient} border border-white/20 flex items-center justify-center`}
+          whileHover={{ scale: 1.1, rotateY: 180 }}
+          transition={{ duration: 0.6 }}
+        >
+          <method.icon className="w-7 h-7 text-white" />
+        </motion.div>
+        <div className="flex-1">
+          <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">{method.title}</h4>
+          <p className="text-gray-600 dark:text-white/60 text-sm mb-2">{method.description}</p>
+          <p className="text-gray-900 dark:text-white font-medium">{method.value}</p>
+        </div>
+        <ArrowRight className="w-5 h-5 text-gray-500 dark:text-white/40 group-hover:text-gray-700 dark:group-hover:text-white group-hover:translate-x-1 transition-all" />
+      </div>
+    </motion.a>
+  );
+});
 
 export function PremiumContact() {
   const [formData, setFormData] = useState({
@@ -140,6 +300,7 @@ export function PremiumContact() {
     phone: '',
     timeline: '',
     projectType: '',
+    plan: 'Professional', // Default plan
     budget: '',
     message: '',
     currency: 'INR',
@@ -165,11 +326,12 @@ export function PremiumContact() {
     'NIGHT100', 'NIGHT200', 'NIGHT300', 'NIGHT400', 'NIGHT500', 'NIGHT600', 'NIGHT700', 'NIGHT800', 'NIGHT900'
   ];
 
-  // Read URL parameters on component mount
+  // Update URL param logic to support plan
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const servicesParam = urlParams.get('services');
     const packageParam = urlParams.get('package');
+    const planParam = urlParams.get('plan');
     const currencyParam = urlParams.get('currency');
     
     if (servicesParam) {
@@ -177,8 +339,10 @@ export function PremiumContact() {
       setSelectedServices(services);
     }
     
-    if (packageParam) {
-      setFormData(prev => ({ ...prev, projectType: packageParam }));
+    if (planParam && planOptions.includes(planParam)) {
+      setFormData(prev => ({ ...prev, plan: planParam }));
+    } else if (packageParam && planOptions.includes(packageParam)) {
+      setFormData(prev => ({ ...prev, plan: packageParam }));
     }
     
     if (currencyParam && (currencyParam === 'USD' || currencyParam === 'INR')) {
@@ -186,42 +350,29 @@ export function PremiumContact() {
     }
   }, []);
 
-  // Package information for display
-  const packageInfo = {
-    "Basic Edit": {
-      priceUSD: "$19.99",
-      priceINR: "₹1,699",
-      duration: "2-3 days",
-      gradient: "from-blue-500 to-cyan-500"
-    },
-    "Professional": {
-      priceUSD: "$69.99",
-      priceINR: "₹5,999",
-      duration: "3-5 days",
-      gradient: "from-orange-500 to-pink-500"
-    },
-    "Cinematic": {
-      priceUSD: "$149.99",
-      priceINR: "₹12,999",
-      duration: "5-7 days",
-      gradient: "from-purple-500 to-indigo-500"
-    }
-  };
+  // Replace the packageInfo object with a single fixed package
+  // const packageInfo = {
+  //   priceUSD: "$69.99",
+  //   priceINR: "₹5,999",
+  //   duration: "3-5 days",
+  //   gradient: "from-orange-500 to-pink-500"
+  // };
 
-  const handleInputChange = (field: string, value: string) => {
+  // Memoize handlers
+  const handleInputChange = useCallback((field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
-  };
+  }, [errors]);
 
-  const handleServiceToggle = (serviceId: string) => {
+  const handleServiceToggle = useCallback((serviceId: string) => {
     setSelectedServices(prev => 
       prev.includes(serviceId) 
         ? prev.filter(id => id !== serviceId)
         : [...prev, serviceId]
     );
-  };
+  }, []);
 
   // Security: Input sanitization function
   const sanitizeInput = (input: string): string => {
@@ -322,23 +473,32 @@ export function PremiumContact() {
     setIsSubmitting(true);
     setErrors({});
 
-    // Prepare data for Formspree
+    // Validate form before submitting
+    const isValid = validateForm();
+    if (!isValid) {
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Prepare data for backend Notion proxy
     const payload = {
       name: formData.name,
       email: formData.email,
       phone: formData.phone,
       timeline: formData.timeline,
       projectType: formData.projectType,
+      plan: formData.plan,
       budget: formData.budget,
       message: formData.message,
       currency: formData.currency,
       couponCode: formData.couponCode,
-      selectedServices: selectedServices.join(', ')
+      selectedServices: selectedServices.join(', '),
+      submittedAt: new Date().toISOString()
     };
 
     try {
-      // Send data to Zapier webhook
-      const response = await fetch('https://hooks.zapier.com/hooks/catch/23779999/u2u1shg/', {
+      // Send to local Notion proxy backend
+      const response = await fetch('http://localhost:4000/api/notion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -352,6 +512,7 @@ export function PremiumContact() {
           phone: '',
           timeline: '',
           projectType: '',
+          plan: 'Professional', // Reset plan
           budget: '',
           message: '',
           currency: 'INR',
@@ -361,41 +522,42 @@ export function PremiumContact() {
         setAppliedDiscount(0);
         setCouponStatus('idle');
       } else {
-        setErrors({ general: 'Submission failed. Please try again.' });
+        const text = await response.text();
+        setErrors({ general: `Submission failed. Status: ${response.status}. Message: ${text}` });
+        console.error('Submission failed:', response.status, text);
       }
     } catch (error) {
       setIsSubmitting(false);
-      setErrors({ general: 'An error occurred. Please try again.' });
+      setErrors({ general: 'An error occurred. Please try again. ' + (error?.message || '') });
+      console.error('Form submission error:', error);
     }
   };
 
+  // Update calculateTotal to use selected plan
   const calculateTotal = () => {
-    if (!formData.projectType || !packageInfo[formData.projectType]) return 0;
-    
-    let basePrice = 0;
-    if (formData.currency === 'USD') {
-      basePrice = parseFloat(packageInfo[formData.projectType].priceUSD.replace('$', ''));
-    } else {
-      basePrice = parseFloat(packageInfo[formData.projectType].priceINR.replace('₹', '').replace(',', ''));
-    }
-    
-    const discount = (basePrice * appliedDiscount) / 100;
-    return basePrice - discount;
+    if (!formData.plan || !packageInfo[formData.plan]) return 0;
+    const base = formData.currency === 'USD'
+      ? packageInfo[formData.plan].priceUSD
+      : packageInfo[formData.plan].priceINR;
+    let total = base;
+    // Add selected add-ons
+    selectedServices.forEach(id => {
+      const addon = optionalServices.find(s => s.id === id);
+      if (addon) {
+        total += base * (formData.currency === 'USD' ? addon.priceUSD : addon.priceINR);
+      }
+    });
+    // Apply discount
+    const discount = (total * appliedDiscount) / 100;
+    return total - discount;
   };
 
+  // Update formatPrice to handle numbers
   const formatPrice = (price: number) => {
     if (formData.currency === 'USD') {
       return `$${price.toFixed(2)}`;
     } else {
-      return `₹${price.toLocaleString('en-IN')}`;
-    }
-  };
-
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 60 },
-    visible: { 
-      opacity: 1, 
-      y: 0
+      return `₹${Math.round(price).toLocaleString('en-IN')}`;
     }
   };
 
@@ -586,7 +748,7 @@ export function PremiumContact() {
             </div>
 
             {/* Selected Plan Display */}
-            {formData.projectType && packageInfo[formData.projectType] && (
+            {formData.plan && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -594,23 +756,26 @@ export function PremiumContact() {
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${packageInfo[formData.projectType].gradient} flex items-center justify-center`}>
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${packageInfo[formData.plan]?.gradient || packageInfo['Professional'].gradient} flex items-center justify-center`}>
                       <Sparkles className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h4 className="text-white font-semibold text-lg">{formData.projectType}</h4>
+                      <h4 className="text-white font-semibold text-lg">{formData.plan}</h4>
                       <p className="text-white/60 text-sm">
-                        {formData.currency === 'USD' ? packageInfo[formData.projectType].priceUSD : packageInfo[formData.projectType].priceINR} • {packageInfo[formData.projectType].duration}
+                        {formData.currency === 'USD' ? packageInfo[formData.plan]?.priceUSD || packageInfo['Professional'].priceUSD : packageInfo[formData.plan]?.priceINR || packageInfo['Professional'].priceINR} • {packageInfo[formData.plan]?.duration || packageInfo['Professional'].duration}
                       </p>
                       <p className="text-white/40 text-xs mt-1">
                         *Prices exclude applicable taxes
                       </p>
+                      <div className="mt-2 text-white/80 text-base font-semibold">
+                        Base Price: {formatPrice(formData.currency === 'USD' ? packageInfo[formData.plan].priceUSD : packageInfo[formData.plan].priceINR)}
+                      </div>
                     </div>
                   </div>
                   <div className="text-right">
                     <div className="text-white/60 text-sm">Selected Plan</div>
-                    <div className={`text-transparent bg-clip-text bg-gradient-to-r ${packageInfo[formData.projectType].gradient} font-bold text-lg`}>
-                      {formData.currency === 'USD' ? packageInfo[formData.projectType].priceUSD : packageInfo[formData.projectType].priceINR}
+                    <div className={`text-transparent bg-clip-text bg-gradient-to-r ${packageInfo[formData.plan]?.gradient || packageInfo['Professional'].gradient} font-bold text-lg`}>
+                      {formData.currency === 'USD' ? packageInfo[formData.plan]?.priceUSD || packageInfo['Professional'].priceUSD : packageInfo[formData.plan]?.priceINR || packageInfo['Professional'].priceINR}
                     </div>
                   </div>
                 </div>
@@ -630,14 +795,17 @@ export function PremiumContact() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-white/40" />
+                      <label htmlFor="name" className="sr-only">Name</label>
                       <input
+                        id="name"
+                        name="name"
                         type="text"
+                        aria-label="Name"
+                        aria-required="true"
                         placeholder="Your Name"
                         value={formData.name}
                         onChange={(e) => handleInputChange('name', e.target.value)}
-                        className={`w-full pl-10 pr-4 py-4 bg-white/[0.08] dark:bg-white/[0.08] bg-gray-50 border rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/40 focus:outline-none focus:border-indigo-400 transition-all ${
-                          errors.name ? 'border-red-400' : 'border-gray-300 dark:border-white/[0.15]'
-                        }`}
+                        className={`w-full pl-10 pr-4 py-4 bg-white/[0.08] dark:bg-white/[0.08] bg-gray-50 border rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/40 focus:outline-none focus:border-indigo-400 transition-all ${errors.name ? 'border-red-400' : 'border-gray-300 dark:border-white/[0.15]'}`}
                       />
                       {errors.name && (
                         <motion.p
@@ -652,14 +820,17 @@ export function PremiumContact() {
 
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-white/40" />
+                      <label htmlFor="email" className="sr-only">Email Address</label>
                       <input
+                        id="email"
+                        name="email"
                         type="email"
+                        aria-label="Email Address"
+                        aria-required="true"
                         placeholder="Email Address"
                         value={formData.email}
                         onChange={(e) => handleInputChange('email', e.target.value)}
-                        className={`w-full pl-10 pr-4 py-4 bg-white/[0.08] dark:bg-white/[0.08] bg-gray-50 border rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/40 focus:outline-none focus:border-indigo-400 transition-all ${
-                          errors.email ? 'border-red-400' : 'border-gray-300 dark:border-white/[0.15]'
-                        }`}
+                        className={`w-full pl-10 pr-4 py-4 bg-white/[0.08] dark:bg-white/[0.08] bg-gray-50 border rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/40 focus:outline-none focus:border-indigo-400 transition-all ${errors.email ? 'border-red-400' : 'border-gray-300 dark:border-white/[0.15]'}`}
                       />
                       {errors.email && (
                         <motion.p
@@ -814,7 +985,7 @@ export function PremiumContact() {
                     </div>
 
                     {/* Cost Summary */}
-                    {formData.projectType && packageInfo[formData.projectType] && (
+                    {formData.plan && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -824,7 +995,7 @@ export function PremiumContact() {
                           <div className="flex items-center justify-between text-sm">
                             <span className="text-gray-700 dark:text-white/80">Base Package:</span>
                             <span className="text-gray-900 dark:text-white font-medium">
-                              {formData.currency === 'USD' ? packageInfo[formData.projectType].priceUSD : packageInfo[formData.projectType].priceINR}
+                              {formData.currency === 'USD' ? packageInfo[formData.plan]?.priceUSD : packageInfo[formData.plan]?.priceINR}
                             </span>
                           </div>
                           {appliedDiscount > 0 && (
@@ -835,7 +1006,7 @@ export function PremiumContact() {
                             >
                               <span className="text-green-600 dark:text-green-400">Discount ({appliedDiscount}%):</span>
                               <span className="text-green-600 dark:text-green-400 font-medium">
-                                -{formatPrice((parseFloat(formData.currency === 'USD' ? packageInfo[formData.projectType].priceUSD.replace('$', '') : packageInfo[formData.projectType].priceINR.replace('₹', '').replace(',', '')) * appliedDiscount) / 100)}
+                                -{formatPrice((parseFloat(formData.currency === 'USD' ? packageInfo[formData.plan]?.priceUSD : packageInfo[formData.plan]?.priceINR) * appliedDiscount))}
                               </span>
                             </motion.div>
                           )}
@@ -851,55 +1022,27 @@ export function PremiumContact() {
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {optionalServices.map((service) => (
-                        <motion.div
+                        <OptionalServiceCard
                           key={service.id}
-                          className={`relative p-4 rounded-xl border transition-all cursor-pointer group ${
-                            selectedServices.includes(service.id)
-                              ? 'bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border-indigo-400/50'
-                              : 'bg-gray-50 dark:bg-white/[0.05] border-gray-200 dark:border-white/[0.15] hover:bg-gray-100 dark:hover:bg-white/[0.08]'
-                          }`}
-                          onClick={() => handleServiceToggle(service.id)}
-                          whileHover={{ scale: 1.02 }}
-                          whileTap={{ scale: 0.98 }}
-                        >
-                          <div className="flex items-start gap-3">
-                            <motion.div
-                              className={`w-10 h-10 rounded-lg bg-gradient-to-br ${service.gradient} border border-white/20 flex items-center justify-center flex-shrink-0`}
-                              whileHover={{ scale: 1.1, rotateY: 180 }}
-                              transition={{ duration: 0.6 }}
-                            >
-                              <service.icon className="w-5 h-5 text-white" />
-                            </motion.div>
-                            
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between mb-1">
-                                <h5 className="text-gray-900 dark:text-white font-medium text-sm">{service.title}</h5>
-                                <motion.div
-                                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                                    selectedServices.includes(service.id)
-                                      ? 'bg-indigo-500 border-indigo-500'
-                                      : 'border-white/30'
-                                  }`}
-                                  animate={{
-                                    scale: selectedServices.includes(service.id) ? [1, 1.2, 1] : 1
-                                  }}
-                                  transition={{ duration: 0.2 }}
-                                >
-                                  {selectedServices.includes(service.id) && (
-                                    <CheckCircle className="w-3 h-3 text-white" />
-                                  )}
-                                </motion.div>
-                              </div>
-                              <p className="text-gray-600 dark:text-white/60 text-xs mb-2">{service.description}</p>
-                              <p className="text-indigo-600 dark:text-indigo-300 text-xs font-medium">
-                                {formData.currency === 'USD' ? service.priceUSD : service.priceINR}
-                              </p>
-                            </div>
-                          </div>
-                        </motion.div>
+                          service={service}
+                          selected={selectedServices.includes(service.id)}
+                          onToggle={handleServiceToggle}
+                          currency={formData.currency}
+                        />
                       ))}
                     </div>
                   </div>
+
+                  {/* General Error Message */}
+                  {errors.general && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-red-400 text-center text-base mb-4"
+                    >
+                      {errors.general}
+                    </motion.p>
+                  )}
 
                   <motion.button
                     type="submit"
@@ -952,7 +1095,7 @@ export function PremiumContact() {
                   </p>
 
                   {/* Selected Plan Summary */}
-                  {formData.projectType && packageInfo[formData.projectType] && (
+                  {formData.plan && (
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -961,13 +1104,13 @@ export function PremiumContact() {
                     >
                       <h4 className="text-gray-900 dark:text-white font-semibold mb-3">Selected Package:</h4>
                       <div className="flex items-center justify-between text-sm mb-2">
-                        <span className="text-gray-700 dark:text-white/80">{formData.projectType}</span>
+                        <span className="text-gray-700 dark:text-white/80">{formData.plan}</span>
                         <span className="text-indigo-600 dark:text-indigo-300 font-medium">
-                          {formData.currency === 'USD' ? packageInfo[formData.projectType].priceUSD : packageInfo[formData.projectType].priceINR}
+                          {formData.currency === 'USD' ? packageInfo[formData.plan]?.priceUSD : packageInfo[formData.plan]?.priceINR}
                         </span>
                       </div>
                       <div className="text-gray-600 dark:text-white/60 text-xs">
-                        Duration: {packageInfo[formData.projectType].duration}
+                        Duration: {packageInfo[formData.plan]?.duration}
                       </div>
                       <div className="text-gray-500 dark:text-white/40 text-xs mt-1">
                         *Price excludes applicable taxes
@@ -1001,7 +1144,7 @@ export function PremiumContact() {
                   <motion.button
                     onClick={() => {
                       setIsSubmitted(false);
-                      setFormData({ name: '', email: '', phone: '', timeline: '', projectType: '', budget: '', message: '', currency: 'INR', couponCode: '' });
+                      setFormData({ name: '', email: '', phone: '', timeline: '', projectType: '', plan: 'Professional', budget: '', message: '', currency: 'INR', couponCode: '' });
                       setSelectedServices([]);
                       setCouponStatus('idle');
                       setAppliedDiscount(0);
@@ -1031,29 +1174,7 @@ export function PremiumContact() {
 
             <div className="space-y-6">
               {contactMethods.map((method, index) => (
-                <motion.a
-                  key={index}
-                  href={method.link}
-                  className="block p-6 bg-gray-50 dark:bg-white/[0.05] backdrop-blur-xl rounded-2xl border border-gray-200 dark:border-white/[0.15] hover:bg-gray-100 dark:hover:bg-white/[0.08] transition-all group"
-                  variants={fadeInUp}
-                  whileHover={{ scale: 1.02, y: -2 }}
-                >
-                  <div className="flex items-center gap-4">
-                    <motion.div
-                      className={`w-14 h-14 rounded-xl bg-gradient-to-br ${method.gradient} border border-white/20 flex items-center justify-center`}
-                      whileHover={{ scale: 1.1, rotateY: 180 }}
-                      transition={{ duration: 0.6 }}
-                    >
-                      <method.icon className="w-7 h-7 text-white" />
-                    </motion.div>
-                    <div className="flex-1">
-                      <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-1">{method.title}</h4>
-                      <p className="text-gray-600 dark:text-white/60 text-sm mb-2">{method.description}</p>
-                      <p className="text-gray-900 dark:text-white font-medium">{method.value}</p>
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-gray-500 dark:text-white/40 group-hover:text-gray-700 dark:group-hover:text-white group-hover:translate-x-1 transition-all" />
-                  </div>
-                </motion.a>
+                <ContactMethodCard key={index} method={method} />
               ))}
             </div>
 
@@ -1094,6 +1215,21 @@ export function PremiumContact() {
           />
         ))}
       </motion.div>
+      {isSubmitted && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          transition={{ duration: 0.5 }}
+          className="p-6 bg-green-100 border border-green-400 rounded-xl text-green-800 text-center mt-8 shadow-lg"
+          role="status"
+          aria-live="polite"
+        >
+          <CheckCircle className="mx-auto mb-2 w-10 h-10 text-green-500 animate-bounce" />
+          <h3 className="text-2xl font-bold mb-2">Thank you!</h3>
+          <p>Your message has been sent successfully. I will get back to you soon.</p>
+        </motion.div>
+      )}
     </section>
   );
 } 
