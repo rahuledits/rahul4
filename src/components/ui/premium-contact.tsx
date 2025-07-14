@@ -480,7 +480,7 @@ export function PremiumContact() {
       return;
     }
 
-    // Prepare data for backend Notion proxy
+    // Prepare data for Zapier webhook
     const payload = {
       name: formData.name,
       email: formData.email,
@@ -497,8 +497,9 @@ export function PremiumContact() {
     };
 
     try {
-      // Send to local Notion proxy backend
-      const response = await fetch('http://localhost:4000/api/notion', {
+      // Use Zapier webhook URL
+      let zapierUrl = 'https://hooks.zapier.com/hooks/catch/23779999/u2u1shg/';
+      const response = await fetch(zapierUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
