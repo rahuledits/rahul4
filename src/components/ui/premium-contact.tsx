@@ -337,9 +337,10 @@ export function PremiumContact() {
     };
 
     try {
-      const response = await fetch('https://formspree.io/f/xqalzdvo', {
+      // Send data to Zapier webhook
+      const response = await fetch('https://hooks.zapier.com/hooks/catch/23779999/u2u1shg/', {
         method: 'POST',
-        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       setIsSubmitting(false);

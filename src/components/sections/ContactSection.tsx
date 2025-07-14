@@ -32,31 +32,22 @@ const ContactSection = ({
     setSubmitStatus('idle');
 
     try {
-      // Simulate email sending (replace with actual email service)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Here you would typically send the email using a service like EmailJS, Formspree, or your own backend
-      console.log('Form submitted:', formData);
-      
-      // For now, we'll simulate a successful submission
+      // Send data to Zapier webhook
+      await fetch('https://hooks.zapier.com/hooks/catch/23779999/u2u1shg/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
       setSubmitStatus('success');
-      
-      // Reset form after successful submission
       setFormData({
         name: '',
         email: '',
         projectType: '',
         message: ''
       });
-      
-      // Reset status after 5 seconds
       setTimeout(() => setSubmitStatus('idle'), 5000);
-      
     } catch (error) {
-      console.error('Error submitting form:', error);
       setSubmitStatus('error');
-      
-      // Reset error status after 5 seconds
       setTimeout(() => setSubmitStatus('idle'), 5000);
     } finally {
       setIsSubmitting(false);
