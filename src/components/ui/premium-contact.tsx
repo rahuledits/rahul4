@@ -390,57 +390,13 @@ export function PremiumContact() {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
-    // Rate limiting check
-    const now = Date.now();
-    if (now - lastSubmitTime < 5000) { // 5 seconds between submissions
-      newErrors.general = 'Please wait 5 seconds between submissions';
-    }
-    
-    if (submitAttempts >= 5) { // Max 5 attempts per session
-      newErrors.general = 'Too many submission attempts. Please try again later.';
-    }
-    
-    // Name validation
-    const sanitizedName = sanitizeInput(formData.name);
-    if (!sanitizedName) {
-      newErrors.name = 'Name is required';
-    } else if (sanitizedName.length < 2) {
-      newErrors.name = 'Name must be at least 2 characters';
-    } else if (sanitizedName.length > 50) {
-      newErrors.name = 'Name must be less than 50 characters';
-    } else if (!/^[a-zA-Z\s]+$/.test(sanitizedName)) {
-      newErrors.name = 'Name can only contain letters and spaces';
-    }
-    
-    // Email validation with stronger regex
-    const sanitizedEmail = sanitizeInput(formData.email);
-    if (!sanitizedEmail) {
-      newErrors.email = 'Email is required';
-    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(sanitizedEmail)) {
-      newErrors.email = 'Please enter a valid email address';
-    } else if (sanitizedEmail.length > 100) {
-      newErrors.email = 'Email is too long';
-    }
-    
-    // Phone validation (optional but if provided, validate format)
-    if (formData.phone) {
-      const sanitizedPhone = sanitizeInput(formData.phone);
-      if (!/^[\+]?[0-9\s\-\(\)]{7,20}$/.test(sanitizedPhone)) {
-        newErrors.phone = 'Please enter a valid phone number';
-      }
-    }
-    
-    // Message validation
-    const sanitizedMessage = sanitizeInput(formData.message);
-    if (!sanitizedMessage) {
-      newErrors.message = 'Message is required';
-    } else if (sanitizedMessage.length < 10) {
-      newErrors.message = 'Message must be at least 10 characters';
-    } else if (sanitizedMessage.length > 1000) {
-      newErrors.message = 'Message must be less than 1000 characters';
-    }
-    
+    if (!formData.name.trim()) newErrors.name = 'Name is required.';
+    if (!formData.email.trim()) newErrors.email = 'Email is required.';
+    else if (!/^\S+@\S+\.\S+$/.test(formData.email)) newErrors.email = 'Enter a valid email address.';
+    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required.';
+    else if (!/^\d{8,15}$/.test(formData.phone.replace(/\D/g, ''))) newErrors.phone = 'Enter a valid phone number.';
+    if (!formData.projectType.trim()) newErrors.projectType = 'Project type is required.';
+    if (!formData.message.trim()) newErrors.message = 'Message is required.';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -469,6 +425,7 @@ export function PremiumContact() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('Form submitted!'); // DEBUG: Check if handler is firing
     e.preventDefault();
     setIsSubmitting(true);
     setErrors({});
@@ -498,14 +455,15 @@ export function PremiumContact() {
 
     try {
       // Use Zapier webhook URL
-      let zapierUrl = 'https://hooks.zapier.com/hooks/catch/23779999/u2u1shg/';
+      let zapierUrl = 'http://localhost:3001/api/contact';
       const response = await fetch(zapierUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
       setIsSubmitting(false);
-      if (response.ok) {
+      const result = await response.json();
+      if (result.success) {
         setIsSubmitted(true);
         setFormData({
           name: '',
@@ -523,9 +481,8 @@ export function PremiumContact() {
         setAppliedDiscount(0);
         setCouponStatus('idle');
       } else {
-        const text = await response.text();
-        setErrors({ general: `Submission failed. Status: ${response.status}. Message: ${text}` });
-        console.error('Submission failed:', response.status, text);
+        setErrors({ general: `Submission failed. ${result.error || ''}` });
+        console.error('Submission failed:', result);
       }
     } catch (error) {
       setIsSubmitting(false);
@@ -795,7 +752,7 @@ export function PremiumContact() {
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="relative">
-                      <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-white/40" />
+                      <User className="absolute left-3 inset-y-0 my-auto flex items-center pointer-events-none h-5 w-5 text-gray-500 dark:text-white/40" />
                       <label htmlFor="name" className="sr-only">Name</label>
                       <input
                         id="name"
@@ -809,18 +766,22 @@ export function PremiumContact() {
                         className={`w-full pl-10 pr-4 py-4 bg-white/[0.08] dark:bg-white/[0.08] bg-gray-50 border rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/40 focus:outline-none focus:border-indigo-400 transition-all ${errors.name ? 'border-red-400' : 'border-gray-300 dark:border-white/[0.15]'}`}
                       />
                       {errors.name && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-red-400 text-sm mt-2"
+                        <motion.div
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0, x: [0, -6, 6, -4, 4, 0] }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.5, type: 'spring', stiffness: 400, damping: 10 }}
+                          className="flex items-center gap-2 mt-2 px-3 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 border-2 border-transparent bg-clip-padding backdrop-blur-md rounded-xl text-red-500 text-sm shadow-lg ring-2 ring-red-400/20"
+                          style={{ borderImage: 'linear-gradient(90deg, #f43f5e 0%, #ec4899 100%) 1' }}
                         >
-                          {errors.name}
-                        </motion.p>
+                          <svg className="w-5 h-5 text-red-400 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.2" fill="#fff3f3"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" /></svg>
+                          <span className="font-semibold drop-shadow">{errors.name}</span>
+                        </motion.div>
                       )}
                     </div>
 
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-white/40" />
+                      <Mail className="absolute left-3 inset-y-0 my-auto flex items-center pointer-events-none h-5 w-5 text-gray-500 dark:text-white/40" />
                       <label htmlFor="email" className="sr-only">Email Address</label>
                       <input
                         id="email"
@@ -834,31 +795,48 @@ export function PremiumContact() {
                         className={`w-full pl-10 pr-4 py-4 bg-white/[0.08] dark:bg-white/[0.08] bg-gray-50 border rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/40 focus:outline-none focus:border-indigo-400 transition-all ${errors.email ? 'border-red-400' : 'border-gray-300 dark:border-white/[0.15]'}`}
                       />
                       {errors.email && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="text-red-400 text-sm mt-2"
+                        <motion.div
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0, x: [0, -6, 6, -4, 4, 0] }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.5, type: 'spring', stiffness: 400, damping: 10 }}
+                          className="flex items-center gap-2 mt-2 px-3 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 border-2 border-transparent bg-clip-padding backdrop-blur-md rounded-xl text-red-500 text-sm shadow-lg ring-2 ring-red-400/20"
+                          style={{ borderImage: 'linear-gradient(90deg, #f43f5e 0%, #ec4899 100%) 1' }}
                         >
-                          {errors.email}
-                        </motion.p>
+                          <svg className="w-5 h-5 text-red-400 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.2" fill="#fff3f3"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" /></svg>
+                          <span className="font-semibold drop-shadow">{errors.email}</span>
+                        </motion.div>
                       )}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="relative">
-                      <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-white/40" />
+                      <Phone className="absolute left-3 inset-y-0 my-auto flex items-center pointer-events-none h-5 w-5 text-gray-500 dark:text-white/40" />
                       <input
                         type="tel"
                         placeholder="Phone Number"
                         value={formData.phone}
                         onChange={(e) => handleInputChange('phone', e.target.value)}
-                        className="w-full pl-10 pr-4 py-4 bg-white/[0.08] dark:bg-white/[0.08] bg-gray-50 border border-gray-300 dark:border-white/[0.15] rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/40 focus:outline-none focus:border-indigo-400 transition-all"
+                        className={`w-full pl-10 pr-4 py-4 bg-white/[0.08] dark:bg-white/[0.08] bg-gray-50 border rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/40 focus:outline-none focus:border-indigo-400 transition-all ${errors.phone ? 'border-red-400' : 'border-gray-300 dark:border-white/[0.15]'}`}
                       />
+                      {errors.phone && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0, x: [0, -6, 6, -4, 4, 0] }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.5, type: 'spring', stiffness: 400, damping: 10 }}
+                          className="flex items-center gap-2 mt-2 px-3 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 border-2 border-transparent bg-clip-padding backdrop-blur-md rounded-xl text-red-500 text-sm shadow-lg ring-2 ring-red-400/20"
+                          style={{ borderImage: 'linear-gradient(90deg, #f43f5e 0%, #ec4899 100%) 1' }}
+                        >
+                          <svg className="w-5 h-5 text-red-400 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.2" fill="#fff3f3"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" /></svg>
+                          <span className="font-semibold drop-shadow">{errors.phone}</span>
+                        </motion.div>
+                      )}
                     </div>
 
                     <div className="relative">
-                      <Clock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-white/40" />
+                      <Clock className="absolute left-3 inset-y-0 my-auto flex items-center pointer-events-none h-5 w-5 text-gray-500 dark:text-white/40" />
                       <input
                         type="text"
                         placeholder="Project Timeline"
@@ -871,21 +849,34 @@ export function PremiumContact() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="relative">
-                      <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-white/40" />
+                      <Building className="absolute left-3 inset-y-0 my-auto flex items-center pointer-events-none h-5 w-5 text-gray-500 dark:text-white/40" />
                       <select
                         value={formData.projectType}
                         onChange={(e) => handleInputChange('projectType', e.target.value)}
-                        className="w-full pl-10 pr-4 py-4 bg-white/[0.08] dark:bg-white/[0.08] bg-gray-50 border border-gray-300 dark:border-white/[0.15] rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-indigo-400 transition-all"
+                        className={`w-full pl-10 pr-4 py-4 bg-white/[0.08] dark:bg-white/[0.08] bg-gray-50 border rounded-xl text-gray-900 dark:text-white focus:outline-none focus:border-indigo-400 transition-all ${errors.projectType ? 'border-red-400' : 'border-gray-300 dark:border-white/[0.15]'}`}
                       >
                         <option value="" className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">Select project type</option>
                         {projectTypes.map(type => (
                           <option key={type} value={type} className="bg-white dark:bg-gray-800 text-gray-900 dark:text-white">{type}</option>
                         ))}
                       </select>
+                      {errors.projectType && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0, x: [0, -6, 6, -4, 4, 0] }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.5, type: 'spring', stiffness: 400, damping: 10 }}
+                          className="flex items-center gap-2 mt-2 px-3 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 border-2 border-transparent bg-clip-padding backdrop-blur-md rounded-xl text-red-500 text-sm shadow-lg ring-2 ring-red-400/20"
+                          style={{ borderImage: 'linear-gradient(90deg, #f43f5e 0%, #ec4899 100%) 1' }}
+                        >
+                          <svg className="w-5 h-5 text-red-400 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.2" fill="#fff3f3"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" /></svg>
+                          <span className="font-semibold drop-shadow">{errors.projectType}</span>
+                        </motion.div>
+                      )}
                     </div>
 
                     <div className="relative">
-                      <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-white/40" />
+                      <Globe className="absolute left-3 inset-y-0 my-auto flex items-center pointer-events-none h-5 w-5 text-gray-500 dark:text-white/40" />
                       <select
                         value={formData.currency}
                         onChange={(e) => {
@@ -900,7 +891,7 @@ export function PremiumContact() {
                     </div>
 
                     <div className="relative">
-                      <Zap className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-white/40" />
+                      <Zap className="absolute left-3 inset-y-0 my-auto flex items-center pointer-events-none h-5 w-5 text-gray-500 dark:text-white/40" />
                       <select
                         value={formData.budget}
                         onChange={(e) => handleInputChange('budget', e.target.value)}
@@ -918,7 +909,7 @@ export function PremiumContact() {
                   <div className="relative">
                     <div className="flex items-center gap-3">
                       <div className="relative flex-1">
-                        <Code className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-white/40" />
+                        <Code className="absolute left-3 inset-y-0 my-auto flex items-center pointer-events-none h-5 w-5 text-gray-500 dark:text-white/40" />
                         <input
                           type="text"
                           placeholder="Have a coupon code? (Optional)"
@@ -945,18 +936,22 @@ export function PremiumContact() {
                       )}
                     </div>
                     {couponStatus === 'invalid' && formData.couponCode.length > 0 && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-red-400 text-sm mt-2"
+                      <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0, x: [0, -6, 6, -4, 4, 0] }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.5, type: 'spring', stiffness: 400, damping: 10 }}
+                        className="flex items-center gap-2 mt-2 px-3 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 border-2 border-transparent bg-clip-padding backdrop-blur-md rounded-xl text-red-500 text-sm shadow-lg ring-2 ring-red-400/20"
+                        style={{ borderImage: 'linear-gradient(90deg, #f43f5e 0%, #ec4899 100%) 1' }}
                       >
-                        Invalid coupon code
-                      </motion.p>
+                        <svg className="w-5 h-5 text-red-400 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.2" fill="#fff3f3"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" /></svg>
+                        <span className="font-semibold drop-shadow">Invalid coupon code</span>
+                      </motion.div>
                     )}
                   </div>
 
                   <div className="relative">
-                    <MessageSquare className="absolute left-3 top-4 h-5 w-5 text-gray-500 dark:text-white/40" />
+                    <MessageSquare className="absolute left-3 inset-y-0 my-auto flex items-center pointer-events-none h-5 w-5 text-gray-500 dark:text-white/40" />
                     <textarea
                       placeholder="Tell us about your project..."
                       rows={6}
@@ -967,14 +962,18 @@ export function PremiumContact() {
                       }`}
                     />
                     {errors.message && (
-                      <motion.p
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-red-400 text-sm mt-2"
-                      >
-                        {errors.message}
-                      </motion.p>
-                    )}
+                        <motion.div
+                          initial={{ opacity: 0, y: -8 }}
+                          animate={{ opacity: 1, y: 0, x: [0, -6, 6, -4, 4, 0] }}
+                          exit={{ opacity: 0, y: -8 }}
+                          transition={{ duration: 0.5, type: 'spring', stiffness: 400, damping: 10 }}
+                          className="flex items-center gap-2 mt-2 px-3 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 border-2 border-transparent bg-clip-padding backdrop-blur-md rounded-xl text-red-500 text-sm shadow-lg ring-2 ring-red-400/20"
+                          style={{ borderImage: 'linear-gradient(90deg, #f43f5e 0%, #ec4899 100%) 1' }}
+                        >
+                          <svg className="w-5 h-5 text-red-400 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.2" fill="#fff3f3"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" /></svg>
+                          <span className="font-semibold drop-shadow">{errors.message}</span>
+                        </motion.div>
+                      )}
                   </div>
 
                   {/* Optional Services Section */}
@@ -1036,42 +1035,66 @@ export function PremiumContact() {
 
                   {/* General Error Message */}
                   {errors.general && (
-                    <motion.p
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="text-red-400 text-center text-base mb-4"
+                    <motion.div
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0, x: [0, -6, 6, -4, 4, 0] }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.5, type: 'spring', stiffness: 400, damping: 10 }}
+                      className="flex items-center gap-2 mt-2 px-3 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 border-2 border-transparent bg-clip-padding backdrop-blur-md rounded-xl text-red-500 text-sm shadow-lg ring-2 ring-red-400/20"
+                      style={{ borderImage: 'linear-gradient(90deg, #f43f5e 0%, #ec4899 100%) 1' }}
                     >
-                      {errors.general}
-                    </motion.p>
+                      <svg className="w-5 h-5 text-red-400 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.2" fill="#fff3f3"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" /></svg>
+                      <span className="font-semibold drop-shadow">{errors.general}</span>
+                    </motion.div>
                   )}
 
                   <motion.button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full relative group overflow-hidden bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium py-4 px-6 rounded-xl transition-all disabled:opacity-50"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                    className="w-full relative group overflow-hidden bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium py-4 px-6 rounded-xl transition-all disabled:opacity-50 focus:ring-4 focus:ring-indigo-300 focus:outline-none"
+                    whileHover={{ scale: isSubmitting ? 1 : 1.03 }}
+                    whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
                   >
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent"
                       initial={{ x: "-100%" }}
-                      whileHover={{ x: "100%" }}
-                      transition={{ duration: 0.5 }}
+                      animate={isSubmitting ? { x: "0%" } : { x: "-100%" }}
+                      transition={{ duration: 0.7, ease: "easeInOut" }}
+                      style={{ zIndex: 1 }}
                     />
-                    <span className="relative flex items-center justify-center gap-2">
-                      {isSubmitting ? (
-                        <motion.div
-                          className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        />
-                      ) : (
-                        <>
-                          <Send className="h-5 w-5" />
-                          Submit Project Request
-                          <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                        </>
-                      )}
+                    <span className="relative flex items-center justify-center gap-3 z-10">
+                      <AnimatePresence mode="wait">
+                        {isSubmitting ? (
+                          <motion.div
+                            key="spinner"
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-center gap-2"
+                          >
+                            <motion.div
+                              className="w-7 h-7 border-4 border-white/30 border-t-white rounded-full mr-2"
+                              animate={{ rotate: 360 }}
+                              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                            />
+                            <span className="text-lg font-semibold tracking-wide">Submitting…</span>
+                          </motion.div>
+                        ) : (
+                          <motion.span
+                            key="text"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.2 }}
+                            className="flex items-center gap-2"
+                          >
+                            <Send className="h-5 w-5" />
+                            Submit Project Request
+                            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
                     </span>
                   </motion.button>
                 </motion.form>

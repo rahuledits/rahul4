@@ -33,7 +33,7 @@ const ContactSection = ({
 
     try {
       // Send data to Zapier webhook
-      await fetch('https://hooks.zapier.com/hooks/catch/23779999/u2u1shg/', {
+      await fetch('http://localhost:3001/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -145,20 +145,14 @@ const ContactSection = ({
                     <Textarea placeholder="Describe your project, style preferences, timeline, and budget range..." value={formData.message} onChange={e => handleInputChange('message', e.target.value)} rows={6} className="w-full bg-gray-100 dark:bg-white/10 border-gray-300 dark:border-white/20 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 backdrop-blur-sm focus:border-orange-500/50" />
                   </div>
                   
-                  <MagnetizeButton 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-semibold py-4 text-lg border-0 disabled:opacity-50 disabled:cursor-not-allowed" 
-                    particleCount={16} 
-                    attractRadius={60}
+                    className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600 text-white font-semibold py-4 text-lg border-0 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   >
                     {isSubmitting ? (
                       <>
-                        <motion.div 
-                          className="w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"
-                          animate={{ rotate: 360 }}
-                          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        />
+                        <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2 animate-spin inline-block" />
                         Sending...
                       </>
                     ) : (
@@ -167,7 +161,7 @@ const ContactSection = ({
                         Send Message
                       </>
                     )}
-                  </MagnetizeButton>
+                  </button>
 
                   {/* Status Messages */}
                   <AnimatePresence>
