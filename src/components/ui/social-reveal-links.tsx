@@ -7,9 +7,9 @@ export const SocialRevealLinks = () => {
   return (
     <div className="grid gap-6">
       <FlipLink href="https://twitter.com">Twitter</FlipLink>
-      <FlipLink href="https://linkedin.com">Linkedin</FlipLink>
-      <FlipLink href="https://facebook.com">Facebook</FlipLink>
+      <FlipLink href="https://github.com/rahul-meena">GitHub</FlipLink>
       <FlipLink href="https://instagram.com/its_rahul_fu">Instagram</FlipLink>
+      <FlipLink href="mailto:jirahulmeena@gmail.com">Email</FlipLink>
     </div>
   );
 };

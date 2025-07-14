@@ -10,6 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { SparklesCore } from "@/components/ui/sparkles";
 import { Facebook, Instagram, Linkedin, Moon, Send, Sun, Twitter } from "lucide-react";
+import { openExternalLink } from "@/utils/security";
 interface FooterdemoProps {
   isDarkMode: boolean;
   onThemeToggle: () => void;
@@ -76,11 +77,14 @@ function Footerdemo({
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="outline" size="icon" className="rounded-full" asChild>
-                      <a href="https://instagram.com/its_rahul_fu" target="_blank" rel="noopener noreferrer">
-                        <Instagram className="h-4 w-4" />
-                        <span className="sr-only">Instagram</span>
-                      </a>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="rounded-full"
+                      onClick={() => openExternalLink('https://instagram.com/its_rahul_fu')}
+                    >
+                      <Instagram className="h-4 w-4" />
+                      <span className="sr-only">Instagram</span>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -110,7 +114,7 @@ function Footerdemo({
             © 2024 Rahul Meena. All rights reserved.
           </p>
           <nav className="flex gap-4 text-sm">
-            <a href="#" className="transition-colors hover:text-primary">
+            <a href="/privacy" className="transition-colors hover:text-primary">
               Privacy Policy
             </a>
             <a href="#" className="transition-colors hover:text-primary">

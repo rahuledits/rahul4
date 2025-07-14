@@ -77,7 +77,7 @@ const Index = ({ isDark, onThemeToggle }: IndexProps) => {
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Mobile scale wrapper: scale down all content on small screens */}
-      <div className="sm:scale-100 scale-90 origin-top w-full" style={{ minWidth: 0 }}>
+      <div className="w-full" style={{ minWidth: 0 }}>
         {/* Site Background */}
         <SiteBackground 
           isDarkMode={isDarkMode} 
@@ -116,6 +116,7 @@ const Index = ({ isDark, onThemeToggle }: IndexProps) => {
         <div className="relative z-30">
           <ServicesSection isDarkMode={isDarkMode} />
         </div>
+
         {/* Pricing Section */}
         <section id="pricing" className="py-20 relative z-30">
           <CreativePricing 
@@ -129,20 +130,20 @@ const Index = ({ isDark, onThemeToggle }: IndexProps) => {
         <div className="relative z-30">
           <TestimonialsSection />
         </div>
-        {/* Social Media Section */}
+        {/* Social Media Section (Animated Handles + Profile Card) */}
+        <div className="relative z-30 py-16 flex flex-row items-center justify-center gap-6 flex-wrap">
+          <SocialRevealLinks />
+          <ProfileCard />
+        </div>
+        {/* Footer */}
         <div className="relative z-30">
-          <InfinityBrand />
+          <Footerdemo isDarkMode={isDarkMode} onThemeToggle={onThemeToggle} />
         </div>
       </div>
       
       {/* Infinity Brand */}
       <div className="relative z-30">
         <InfinityBrand />
-      </div>
-      
-      {/* Footer */}
-      <div className="relative z-30">
-        <Footerdemo isDarkMode={isDarkMode} onThemeToggle={onThemeToggle} />
       </div>
     </div>
   );

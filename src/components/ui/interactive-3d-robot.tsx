@@ -14,13 +14,13 @@ export function InteractiveRobotSpline({ scene, className }: InteractiveRobotSpl
   return (
     <Suspense
       fallback={
-        <div className={`w-full h-full flex items-center justify-center bg-gray-900 text-white ${className}`}>
+        <div className={`w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-900 to-purple-900 text-white ${className}`}>
           <div className="flex flex-col items-center">
-            <svg className="animate-spin h-8 w-8 text-white mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l2-2.647z"></path>
-            </svg>
-            <span className="text-sm">Loading 3D Scene...</span>
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full animate-pulse mb-4 flex items-center justify-center">
+              <span className="text-2xl">🤖</span>
+            </div>
+            <span className="text-sm font-medium">Loading 3D Robot...</span>
+            <span className="text-xs text-gray-300 mt-1">This may take a few seconds</span>
           </div>
         </div>
       }
@@ -28,8 +28,14 @@ export function InteractiveRobotSpline({ scene, className }: InteractiveRobotSpl
       <Spline
         scene={scene}
         className={className}
-        onLoad={() => console.log('Spline scene loaded successfully')}
-        onError={(error) => console.error('Spline scene error:', error)}
+        onLoad={() => {
+          console.log('✅ Spline scene loaded successfully');
+          console.log('Scene URL:', scene);
+        }}
+        onError={(error) => {
+          console.error('❌ Spline scene error:', error);
+          console.error('Scene URL:', scene);
+        }}
       />
     </Suspense>
   );

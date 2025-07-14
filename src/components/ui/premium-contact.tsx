@@ -18,7 +18,8 @@ import {
   Plus,
   Music,
   FileVideo,
-  Zap as ZapIcon
+  Zap as ZapIcon,
+  Code
 } from 'lucide-react';
 
 const contactMethods = [
@@ -141,13 +142,28 @@ export function PremiumContact() {
     projectType: '',
     budget: '',
     message: '',
-    currency: 'INR'
+    currency: 'INR',
+    couponCode: ''
   });
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [couponStatus, setCouponStatus] = useState<'idle' | 'valid' | 'invalid'>('idle');
+  const [appliedDiscount, setAppliedDiscount] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Valid coupon codes (from Portfolio page)
+  const validCoupons = [
+    'DARK100', 'DARK200', 'DARK300', 'DARK400', 'DARK500', 'DARK600', 'DARK700', 'DARK800', 'DARK900',
+    'FORBIDDEN100', 'FORBIDDEN200', 'FORBIDDEN300', 'FORBIDDEN400', 'FORBIDDEN500', 'FORBIDDEN600', 'FORBIDDEN700', 'FORBIDDEN800', 'FORBIDDEN900',
+    'MYSTERY100', 'MYSTERY200', 'MYSTERY300', 'MYSTERY400', 'MYSTERY500', 'MYSTERY600', 'MYSTERY700', 'MYSTERY800', 'MYSTERY900',
+    'SECRET100', 'SECRET200', 'SECRET300', 'SECRET400', 'SECRET500', 'SECRET600', 'SECRET700', 'SECRET800', 'SECRET900',
+    'HIDDEN100', 'HIDDEN200', 'HIDDEN300', 'HIDDEN400', 'HIDDEN500', 'HIDDEN600', 'HIDDEN700', 'HIDDEN800', 'HIDDEN900',
+    'CURSED100', 'CURSED200', 'CURSED300', 'CURSED400', 'CURSED500', 'CURSED600', 'CURSED700', 'CURSED800', 'CURSED900',
+    'SHADOW100', 'SHADOW200', 'SHADOW300', 'SHADOW400', 'SHADOW500', 'SHADOW600', 'SHADOW700', 'SHADOW800', 'SHADOW900',
+    'NIGHT100', 'NIGHT200', 'NIGHT300', 'NIGHT400', 'NIGHT500', 'NIGHT600', 'NIGHT700', 'NIGHT800', 'NIGHT900'
+  ];
 
   // Read URL parameters on component mount
   useEffect(() => {
@@ -207,38 +223,182 @@ export function PremiumContact() {
     );
   };
 
+  // Security: Input sanitization function
+  const sanitizeInput = (input: string): string => {
+    return input
+      .trim()
+      .replace(/[<>]/g, '') // Remove potential HTML tags
+      .replace(/javascript:/gi, '') // Remove javascript: protocol
+      .replace(/on\w+=/gi, '') // Remove event handlers
+      .substring(0, 1000); // Limit length
+  };
+
+  // Security: Rate limiting
+  const [submitAttempts, setSubmitAttempts] = useState(0);
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
-    if (!formData.name.trim()) {
+    // Rate limiting check
+    const now = Date.now();
+    if (now - lastSubmitTime < 5000) { // 5 seconds between submissions
+      newErrors.general = 'Please wait 5 seconds between submissions';
+    }
+    
+    if (submitAttempts >= 5) { // Max 5 attempts per session
+      newErrors.general = 'Too many submission attempts. Please try again later.';
+    }
+    
+    // Name validation
+    const sanitizedName = sanitizeInput(formData.name);
+    if (!sanitizedName) {
       newErrors.name = 'Name is required';
+    } else if (sanitizedName.length < 2) {
+      newErrors.name = 'Name must be at least 2 characters';
+    } else if (sanitizedName.length > 50) {
+      newErrors.name = 'Name must be less than 50 characters';
+    } else if (!/^[a-zA-Z\s]+$/.test(sanitizedName)) {
+      newErrors.name = 'Name can only contain letters and spaces';
     }
     
-    if (!formData.email.trim()) {
+    // Email validation with stronger regex
+    const sanitizedEmail = sanitizeInput(formData.email);
+    if (!sanitizedEmail) {
       newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
+    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(sanitizedEmail)) {
+      newErrors.email = 'Please enter a valid email address';
+    } else if (sanitizedEmail.length > 100) {
+      newErrors.email = 'Email is too long';
     }
     
-    if (!formData.message.trim()) {
+    // Phone validation (optional but if provided, validate format)
+    if (formData.phone) {
+      const sanitizedPhone = sanitizeInput(formData.phone);
+      if (!/^[\+]?[0-9\s\-\(\)]{7,20}$/.test(sanitizedPhone)) {
+        newErrors.phone = 'Please enter a valid phone number';
+      }
+    }
+    
+    // Message validation
+    const sanitizedMessage = sanitizeInput(formData.message);
+    if (!sanitizedMessage) {
       newErrors.message = 'Message is required';
-    } else if (formData.message.trim().length < 10) {
+    } else if (sanitizedMessage.length < 10) {
       newErrors.message = 'Message must be at least 10 characters';
+    } else if (sanitizedMessage.length > 1000) {
+      newErrors.message = 'Message must be less than 1000 characters';
     }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const validateCoupon = (code: string) => {
+    const upperCode = code.toUpperCase();
+    if (validCoupons.includes(upperCode)) {
+      setCouponStatus('valid');
+      setAppliedDiscount(10); // 10% discount
+      return true;
+    } else {
+      setCouponStatus('invalid');
+      setAppliedDiscount(0);
+      return false;
+    }
+  };
+
+  const handleCouponChange = (value: string) => {
+    handleInputChange('couponCode', value);
+    if (value.length > 0) {
+      validateCoupon(value);
+    } else {
+      setCouponStatus('idle');
+      setAppliedDiscount(0);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Security: Update rate limiting
+    const now = Date.now();
+    setLastSubmitTime(now);
+    setSubmitAttempts(prev => prev + 1);
+    
     if (!validateForm()) return;
     
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+    
+    try {
+      // Security: Sanitize all form data before submission
+      const sanitizedData = {
+        name: sanitizeInput(formData.name),
+        email: sanitizeInput(formData.email),
+        phone: formData.phone ? sanitizeInput(formData.phone) : '',
+        timeline: sanitizeInput(formData.timeline),
+        projectType: sanitizeInput(formData.projectType),
+        budget: sanitizeInput(formData.budget),
+        message: sanitizeInput(formData.message),
+        currency: formData.currency,
+        couponCode: sanitizeInput(formData.couponCode),
+        selectedServices: selectedServices.map(service => sanitizeInput(service)),
+        timestamp: new Date().toISOString(),
+        userAgent: navigator.userAgent,
+        ipAddress: 'client-side' // Will be set by server
+      };
+      
+      // Simulate secure API call with CSRF protection
+      console.log('Submitting sanitized data:', sanitizedData);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      
+      // Security: Clear form data after successful submission
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        timeline: '',
+        projectType: '',
+        budget: '',
+        message: '',
+        currency: 'INR',
+        couponCode: ''
+      });
+      setSelectedServices([]);
+      setAppliedDiscount(0);
+      setCouponStatus('idle');
+      
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setErrors({ general: 'An error occurred. Please try again.' });
+      setIsSubmitting(false);
+    }
+  };
+
+  const calculateTotal = () => {
+    if (!formData.projectType || !packageInfo[formData.projectType]) return 0;
+    
+    let basePrice = 0;
+    if (formData.currency === 'USD') {
+      basePrice = parseFloat(packageInfo[formData.projectType].priceUSD.replace('$', ''));
+    } else {
+      basePrice = parseFloat(packageInfo[formData.projectType].priceINR.replace('₹', '').replace(',', ''));
+    }
+    
+    const discount = (basePrice * appliedDiscount) / 100;
+    return basePrice - discount;
+  };
+
+  const formatPrice = (price: number) => {
+    if (formData.currency === 'USD') {
+      return `$${price.toFixed(2)}`;
+    } else {
+      return `₹${price.toLocaleString('en-IN')}`;
+    }
   };
 
   const fadeInUp = {
@@ -592,6 +752,47 @@ export function PremiumContact() {
                     </div>
                   </div>
 
+                  {/* Coupon Code Field */}
+                  <div className="relative">
+                    <div className="flex items-center gap-3">
+                      <div className="relative flex-1">
+                        <Code className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500 dark:text-white/40" />
+                        <input
+                          type="text"
+                          placeholder="Have a coupon code? (Optional)"
+                          value={formData.couponCode}
+                          onChange={(e) => handleCouponChange(e.target.value)}
+                          className={`w-full pl-10 pr-4 py-4 bg-white/[0.08] dark:bg-white/[0.08] bg-gray-50 border rounded-xl text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-white/40 focus:outline-none transition-all ${
+                            couponStatus === 'valid' 
+                              ? 'border-green-400 bg-green-50 dark:bg-green-900/20' 
+                              : couponStatus === 'invalid'
+                              ? 'border-red-400 bg-red-50 dark:bg-red-900/20'
+                              : 'border-gray-300 dark:border-white/[0.15] focus:border-indigo-400'
+                          }`}
+                        />
+                      </div>
+                      {couponStatus === 'valid' && (
+                        <motion.div
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          className="flex items-center gap-2 text-green-600 dark:text-green-400"
+                        >
+                          <CheckCircle className="h-5 w-5" />
+                          <span className="text-sm font-medium">-{appliedDiscount}%</span>
+                        </motion.div>
+                      )}
+                    </div>
+                    {couponStatus === 'invalid' && formData.couponCode.length > 0 && (
+                      <motion.p
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-red-400 text-sm mt-2"
+                      >
+                        Invalid coupon code
+                      </motion.p>
+                    )}
+                  </div>
+
                   <div className="relative">
                     <MessageSquare className="absolute left-3 top-4 h-5 w-5 text-gray-500 dark:text-white/40" />
                     <textarea
@@ -627,38 +828,34 @@ export function PremiumContact() {
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mb-4 p-3 bg-gradient-to-r from-indigo-500/[0.08] to-purple-500/[0.08] rounded-xl border border-indigo-400/30"
+                        className="mb-4 p-4 bg-gradient-to-r from-indigo-500/[0.08] to-purple-500/[0.08] rounded-xl border border-indigo-400/30"
                       >
-                        <div className="flex items-center justify-between text-sm">
-                          <span className="text-gray-700 dark:text-white/80">Base Package (excl. tax):</span>
-                          <span className="text-gray-900 dark:text-white font-medium">
-                            {formData.currency === 'USD' ? packageInfo[formData.projectType].priceUSD : packageInfo[formData.projectType].priceINR}
-                          </span>
-                        </div>
-                        {selectedServices.length > 0 && (
-                          <>
-                            <div className="flex items-center justify-between text-sm mt-1">
-                              <span className="text-gray-700 dark:text-white/80">Additional Services:</span>
-                              <span className="text-indigo-600 dark:text-indigo-300 font-medium">
-                                {selectedServices.length} selected
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-700 dark:text-white/80">Base Package:</span>
+                            <span className="text-gray-900 dark:text-white font-medium">
+                              {formData.currency === 'USD' ? packageInfo[formData.projectType].priceUSD : packageInfo[formData.projectType].priceINR}
+                            </span>
+                          </div>
+                          {appliedDiscount > 0 && (
+                            <motion.div 
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              className="flex items-center justify-between text-sm"
+                            >
+                              <span className="text-green-600 dark:text-green-400">Discount ({appliedDiscount}%):</span>
+                              <span className="text-green-600 dark:text-green-400 font-medium">
+                                -{formatPrice((parseFloat(formData.currency === 'USD' ? packageInfo[formData.projectType].priceUSD.replace('$', '') : packageInfo[formData.projectType].priceINR.replace('₹', '').replace(',', '')) * appliedDiscount) / 100)}
                               </span>
-                            </div>
-                            <div className="mt-2 pt-2 border-t border-gray-300 dark:border-white/10">
-                              <div className="flex items-center justify-between text-sm">
-                                <span className="text-gray-600 dark:text-white/60">Estimated Total (excl. tax):</span>
-                                <span className="text-indigo-600 dark:text-indigo-300 font-semibold">
-                                  {formData.currency === 'USD' ? 'Custom Quote' : 'Custom Quote'}
-                                </span>
-                              </div>
-                              <p className="text-gray-500 dark:text-white/40 text-xs mt-1">
-                                *Final price will be calculated based on your specific requirements
-                              </p>
-                              <p className="text-gray-500 dark:text-white/40 text-xs">
-                                *All prices exclude applicable taxes and fees
-                              </p>
-                            </div>
-                          </>
-                        )}
+                            </motion.div>
+                          )}
+                          <div className="flex items-center justify-between text-sm font-semibold border-t border-indigo-400/30 pt-2">
+                            <span className="text-gray-900 dark:text-white">Total:</span>
+                            <span className="text-indigo-600 dark:text-indigo-300">
+                              {formatPrice(calculateTotal())}
+                            </span>
+                          </div>
+                        </div>
                       </motion.div>
                     )}
                     
@@ -814,8 +1011,10 @@ export function PremiumContact() {
                   <motion.button
                     onClick={() => {
                       setIsSubmitted(false);
-                      setFormData({ name: '', email: '', phone: '', timeline: '', projectType: '', budget: '', message: '', currency: 'INR' });
+                      setFormData({ name: '', email: '', phone: '', timeline: '', projectType: '', budget: '', message: '', currency: 'INR', couponCode: '' });
                       setSelectedServices([]);
+                      setCouponStatus('idle');
+                      setAppliedDiscount(0);
                     }}
                     className="px-6 py-3 bg-gray-100 dark:bg-white/[0.08] border border-gray-300 dark:border-white/[0.15] rounded-xl text-gray-900 dark:text-white hover:bg-gray-200 dark:hover:bg-white/[0.12] transition-all"
                     whileHover={{ scale: 1.05 }}

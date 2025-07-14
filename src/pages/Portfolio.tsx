@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef, useEffect, Suspense, lazy } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Eye, Calendar, Tag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -134,11 +134,65 @@ const Portfolio = ({ isDark, onThemeToggle }) => {
     ? projects 
     : projects.filter(project => project.category === selectedCategory);
 
-  const [showVideo, setShowVideo] = useState(false);
-  const [videoEnded, setVideoEnded] = useState(false);
-  const [currentVideoUrl, setCurrentVideoUrl] = useState("");
   const [playingProjectId, setPlayingProjectId] = useState(null);
   const confettiRef = useRef(null);
+  const [suspense, setSuspense] = useState(false);
+  const [suspensePhase, setSuspensePhase] = useState(0);
+  const [showDiscount, setShowDiscount] = useState(false);
+  const [showNoLuck, setShowNoLuck] = useState(false);
+  const [hasClicked, setHasClicked] = useState(() => {
+    return localStorage.getItem('portfolioButtonClicked') === 'true';
+  });
+  const [discountCode, setDiscountCode] = useState('');
+  const suspenseTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const generateRandomCode = () => {
+    const prefixes = ['DARK', 'FORBIDDEN', 'MYSTERY', 'SECRET', 'HIDDEN', 'CURSED', 'SHADOW', 'NIGHT'];
+    const numbers = Math.floor(Math.random() * 900) + 100; // 100-999
+    const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+    return `${prefix}${numbers}`;
+  };
+
+  const handleDontClick = () => {
+    if (hasClicked) {
+      toast({ 
+        title: "🚫 Already Used", 
+        description: "You've already used your one chance with the forbidden button!" 
+      });
+      return;
+    }
+
+    setHasClicked(true);
+    localStorage.setItem('portfolioButtonClicked', 'true');
+    setSuspense(true);
+    setSuspensePhase(0);
+    
+    // Phase 1: Initial suspense
+    suspenseTimeout.current = setTimeout(() => {
+      setSuspensePhase(1);
+    }, 2000);
+    
+    // Phase 2: More intense
+    suspenseTimeout.current = setTimeout(() => {
+      setSuspensePhase(2);
+    }, 4000);
+    
+    // Final reveal with random outcome
+    suspenseTimeout.current = setTimeout(() => {
+      setSuspense(false);
+      setSuspensePhase(0);
+      
+      // 50% chance to get discount
+      const random = Math.random();
+      if (random < 0.5) {
+        setDiscountCode(generateRandomCode());
+        setShowDiscount(true);
+        launchConfetti(confettiRef.current);
+      } else {
+        setShowNoLuck(true);
+      }
+    }, 6000);
+  };
 
   // Location-based pricing
   const [isIndia, setIsIndia] = useState(false);
@@ -329,14 +383,206 @@ const Portfolio = ({ isDark, onThemeToggle }) => {
       <canvas ref={confettiRef} width={window.innerWidth} height={window.innerHeight} style={{position:'fixed',top:0,left:0,pointerEvents:'none',zIndex:9999}} />
       {/* Add the button at the bottom of the page */}
       <div className="w-full flex justify-center pb-12">
-        <AnimatedButton className="mt-8 text-lg" onClick={() => {
-          toast({ title: "🎉 Surprise!", description: "Confetti party! You clicked the forbidden button. 💃🕺" });
-          launchConfetti(confettiRef.current);
-          setShowVideo(true);
-        }}>
-          Don't Click It
+        <AnimatedButton 
+          className={`mt-8 text-lg ${hasClicked ? 'opacity-50 cursor-not-allowed' : ''}`}
+          onClick={handleDontClick}
+        >
+          {hasClicked ? 'Already Clicked' : "Don't Click It"}
         </AnimatedButton>
       </div>
+      {/* Suspense overlay */}
+      <AnimatePresence>
+        {suspense && (
+          <motion.div
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/98 backdrop-blur-2xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.8, ease: 'easeInOut' }}
+          >
+            <div className="flex flex-col items-center">
+              <motion.div 
+                className="text-3xl font-light text-gray-200 mb-8 tracking-widest"
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                {suspensePhase === 0 && "You shouldn't have clicked that..."}
+                {suspensePhase === 1 && "Something is happening..."}
+                {suspensePhase === 2 && "Almost there..."}
+              </motion.div>
+              <motion.div 
+                className="w-16 h-16 border-3 border-t-3 border-t-red-500 border-gray-700 rounded-full animate-spin mb-6"
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+              <motion.div 
+                className="text-sm text-gray-400 font-light tracking-wider"
+                animate={{ opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 1.8, repeat: Infinity }}
+              >
+                {suspensePhase === 0 && "Calculating your fate..."}
+                {suspensePhase === 1 && "Processing the consequences..."}
+                {suspensePhase === 2 && "Preparing your surprise..."}
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+        {/* Discount Popup */}
+        <AnimatePresence>
+          {showDiscount && (
+            <motion.div
+              className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/95 backdrop-blur-2xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <motion.div
+                className="bg-gradient-to-br from-red-900 via-black to-red-800 p-1 rounded-2xl shadow-2xl border border-red-600"
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                exit={{ scale: 0, rotate: 180 }}
+                transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
+              >
+                <div className="bg-black rounded-xl p-8 text-center relative overflow-hidden border border-red-500">
+                  {/* Dark background effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-red-900/30 via-black/50 to-red-800/30 animate-pulse"></div>
+                  
+                  {/* Main content */}
+                  <div className="relative z-10">
+                    <motion.div
+                      className="text-6xl mb-4"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.3, type: "spring" }}
+                    >
+                      💀
+                    </motion.div>
+                    
+                    <motion.h2
+                      className="text-3xl font-bold text-red-500 mb-2 font-mono"
+                      initial={{ y: 50, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      YOU'VE BEEN CHOSEN
+                    </motion.h2>
+                    
+                    <motion.p
+                      className="text-xl text-red-300 mb-6 font-mono"
+                      initial={{ y: 50, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      The forbidden button has granted you power...
+                    </motion.p>
+                    
+                    <motion.div
+                      className="bg-gradient-to-r from-red-900 to-black text-red-400 text-2xl font-bold py-4 px-8 rounded-lg mb-4 border-2 border-red-600 font-mono"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.6, type: "spring" }}
+                    >
+                      10% DARK DISCOUNT
+                    </motion.div>
+                    
+                    <motion.div
+                      className="bg-gray-900 text-red-400 font-mono text-lg py-3 px-6 rounded-lg mb-6 border border-red-600"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.7 }}
+                    >
+                      Dark Code: <span className="text-red-300 font-bold">{discountCode}</span>
+                    </motion.div>
+                    
+                    <motion.button
+                      onClick={() => setShowDiscount(false)}
+                      className="bg-red-900 hover:bg-red-800 text-red-300 font-bold py-3 px-8 rounded-lg transition-colors border border-red-600 font-mono"
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.8 }}
+                    >
+                      Accept the Darkness 🔥
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {/* No Luck Popup */}
+        <AnimatePresence>
+          {showNoLuck && (
+            <motion.div
+              className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/95 backdrop-blur-2xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <motion.div
+                className="bg-gradient-to-br from-gray-800 via-black to-gray-700 p-1 rounded-2xl shadow-2xl border border-gray-600"
+                initial={{ scale: 0, rotate: -180 }}
+                animate={{ scale: 1, rotate: 0 }}
+                exit={{ scale: 0, rotate: 180 }}
+                transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
+              >
+                <div className="bg-black rounded-xl p-8 text-center relative overflow-hidden border border-gray-500">
+                  <div className="absolute inset-0 bg-gradient-to-r from-gray-800/30 via-black/50 to-gray-700/30 animate-pulse"></div>
+                  
+                  <div className="relative z-10">
+                    <motion.div
+                      className="text-6xl mb-4"
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.3, type: "spring" }}
+                    >
+                      😔
+                    </motion.div>
+                    
+                    <motion.h2
+                      className="text-3xl font-bold text-gray-400 mb-2 font-mono"
+                      initial={{ y: 50, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.4 }}
+                    >
+                      BETTER LUCK NEXT TIME
+                    </motion.h2>
+                    
+                    <motion.p
+                      className="text-xl text-gray-300 mb-6 font-mono"
+                      initial={{ y: 50, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.5 }}
+                    >
+                      The forbidden button wasn't impressed this time...
+                    </motion.p>
+                    
+                    <motion.div
+                      className="bg-gradient-to-r from-gray-800 to-black text-gray-400 text-xl font-bold py-4 px-8 rounded-lg mb-4 border-2 border-gray-600 font-mono"
+                      initial={{ scale: 0.8, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.6, type: "spring" }}
+                    >
+                      Try again later
+                    </motion.div>
+                    
+                    <motion.button
+                      onClick={() => setShowNoLuck(false)}
+                      className="bg-gray-800 hover:bg-gray-700 text-gray-300 font-bold py-3 px-8 rounded-lg transition-colors border border-gray-600 font-mono"
+                      initial={{ y: 20, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.8 }}
+                    >
+                      Accept Defeat 😞
+                    </motion.button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
     </>
   );
 };
