@@ -319,63 +319,52 @@ export function PremiumContact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Security: Update rate limiting
-    const now = Date.now();
-    setLastSubmitTime(now);
-    setSubmitAttempts(prev => prev + 1);
-    
-    if (!validateForm()) return;
-    
     setIsSubmitting(true);
-    
+    setErrors({});
+
+    // Prepare data for Formspree
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      timeline: formData.timeline,
+      projectType: formData.projectType,
+      budget: formData.budget,
+      message: formData.message,
+      currency: formData.currency,
+      couponCode: formData.couponCode,
+      selectedServices: selectedServices.join(', ')
+    };
+
     try {
-      // Security: Sanitize all form data before submission
-      const sanitizedData = {
-        name: sanitizeInput(formData.name),
-        email: sanitizeInput(formData.email),
-        phone: formData.phone ? sanitizeInput(formData.phone) : '',
-        timeline: sanitizeInput(formData.timeline),
-        projectType: sanitizeInput(formData.projectType),
-        budget: sanitizeInput(formData.budget),
-        message: sanitizeInput(formData.message),
-        currency: formData.currency,
-        couponCode: sanitizeInput(formData.couponCode),
-        selectedServices: selectedServices.map(service => sanitizeInput(service)),
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent,
-        ipAddress: 'client-side' // Will be set by server
-      };
-      
-      // Simulate secure API call with CSRF protection
-      console.log('Submitting sanitized data:', sanitizedData);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      setIsSubmitting(false);
-      setIsSubmitted(true);
-      
-      // Security: Clear form data after successful submission
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        timeline: '',
-        projectType: '',
-        budget: '',
-        message: '',
-        currency: 'INR',
-        couponCode: ''
+      const response = await fetch('https://formspree.io/f/xqalzdvo', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
-      setSelectedServices([]);
-      setAppliedDiscount(0);
-      setCouponStatus('idle');
-      
-    } catch (error) {
-      console.error('Form submission error:', error);
-      setErrors({ general: 'An error occurred. Please try again.' });
       setIsSubmitting(false);
+      if (response.ok) {
+        setIsSubmitted(true);
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          timeline: '',
+          projectType: '',
+          budget: '',
+          message: '',
+          currency: 'INR',
+          couponCode: ''
+        });
+        setSelectedServices([]);
+        setAppliedDiscount(0);
+        setCouponStatus('idle');
+      } else {
+        setErrors({ general: 'Submission failed. Please try again.' });
+      }
+    } catch (error) {
+      setIsSubmitting(false);
+      setErrors({ general: 'An error occurred. Please try again.' });
     }
   };
 
