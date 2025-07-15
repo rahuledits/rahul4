@@ -455,7 +455,9 @@ export function PremiumContact() {
 
     try {
       // Use Zapier webhook URL
-      let zapierUrl = 'http://localhost:3001/api/contact';
+      let zapierUrl = process.env.NODE_ENV === 'production'
+        ? '/api/contact'
+        : 'http://localhost:3001/api/contact';
       const response = await fetch(zapierUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
