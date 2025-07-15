@@ -1,4 +1,4 @@
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -22,7 +22,6 @@ module.exports = async (req, res) => {
     }
   }
 
-  console.log('Received request body:', body);
   const zapierUrl = 'https://hooks.zapier.com/hooks/catch/23779999/u2u1shg/';
   try {
     const zapierRes = await fetch(zapierUrl, {
@@ -39,4 +38,4 @@ module.exports = async (req, res) => {
   } catch (err) {
     res.status(500).json({ success: false, error: (err && err.stack ? err.stack : err) });
   }
-}; 
+} 
