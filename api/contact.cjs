@@ -1,16 +1,34 @@
-const fetch = require('node-fetch');
-
 module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return;
+  }
+
   if (req.method !== 'POST') {
     res.status(405).json({ success: false, error: 'Method Not Allowed' });
     return;
   }
+
+  let body = req.body;
+  if (!body || typeof body !== 'object') {
+    try {
+      body = JSON.parse(req.body);
+    } catch {
+      body = {};
+    }
+  }
+
+  console.log('Received request body:', body);
   const zapierUrl = 'https://hooks.zapier.com/hooks/catch/23779999/u2u1shg/';
   try {
     const zapierRes = await fetch(zapierUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(req.body)
+      body: JSON.stringify(body)
     });
     const data = await zapierRes.text();
     if (zapierRes.ok) {
