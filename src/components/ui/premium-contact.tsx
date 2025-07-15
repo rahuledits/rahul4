@@ -822,14 +822,34 @@ export function PremiumContact() {
                       />
                       {errors.phone && (
                         <motion.div
-                          initial={{ opacity: 0, y: -8 }}
-                          animate={{ opacity: 1, y: 0, x: [0, -6, 6, -4, 4, 0] }}
+                          initial={{ opacity: 0, y: -8, boxShadow: '0 0 0 0 #f43f5e' }}
+                          animate={{
+                            opacity: 1,
+                            y: 0,
+                            x: [0, -6, 6, -4, 4, 0],
+                            boxShadow: [
+                              '0 0 0 0 #f43f5e',
+                              '0 0 0 4px #f43f5e55',
+                              '0 0 0 0 #f43f5e',
+                            ],
+                          }}
                           exit={{ opacity: 0, y: -8 }}
-                          transition={{ duration: 0.5, type: 'spring', stiffness: 400, damping: 10 }}
-                          className="flex items-center gap-2 mt-2 px-3 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 border-2 border-transparent bg-clip-padding backdrop-blur-md rounded-xl text-red-500 text-sm shadow-lg ring-2 ring-red-400/20"
-                          style={{ borderImage: 'linear-gradient(90deg, #f43f5e 0%, #ec4899 100%) 1' }}
+                          transition={{ duration: 0.7, type: 'spring', stiffness: 400, damping: 10 }}
+                          className="flex items-center gap-2 mt-2 px-3 py-2 bg-gradient-to-r from-red-500/30 to-pink-500/30 border-2 border-transparent bg-clip-padding backdrop-blur-md rounded-xl text-red-500 text-sm shadow-xl ring-2 ring-red-400/30 animate-pulse"
+                          style={{ borderImage: 'linear-gradient(90deg, #f43f5e 0%, #ec4899 100%) 1', boxShadow: '0 0 16px 2px #f43f5e55' }}
                         >
-                          <svg className="w-5 h-5 text-red-400 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.2" fill="#fff3f3"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" /></svg>
+                          <motion.svg
+                            className="w-5 h-5 text-red-400 animate-bounce"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.2"
+                            viewBox="0 0 24 24"
+                            animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
+                            transition={{ duration: 0.7, repeat: Infinity, repeatType: 'loop' }}
+                          >
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.2" fill="#fff3f3" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" />
+                          </motion.svg>
                           <span className="font-semibold drop-shadow">{errors.phone}</span>
                         </motion.div>
                       )}
@@ -862,14 +882,34 @@ export function PremiumContact() {
                       </select>
                       {errors.projectType && (
                         <motion.div
-                          initial={{ opacity: 0, y: -8 }}
-                          animate={{ opacity: 1, y: 0, x: [0, -6, 6, -4, 4, 0] }}
+                          initial={{ opacity: 0, y: -8, boxShadow: '0 0 0 0 #f43f5e' }}
+                          animate={{
+                            opacity: 1,
+                            y: 0,
+                            x: [0, -6, 6, -4, 4, 0],
+                            boxShadow: [
+                              '0 0 0 0 #f43f5e',
+                              '0 0 0 4px #f43f5e55',
+                              '0 0 0 0 #f43f5e',
+                            ],
+                          }}
                           exit={{ opacity: 0, y: -8 }}
-                          transition={{ duration: 0.5, type: 'spring', stiffness: 400, damping: 10 }}
-                          className="flex items-center gap-2 mt-2 px-3 py-2 bg-gradient-to-r from-red-500/20 to-pink-500/20 border-2 border-transparent bg-clip-padding backdrop-blur-md rounded-xl text-red-500 text-sm shadow-lg ring-2 ring-red-400/20"
-                          style={{ borderImage: 'linear-gradient(90deg, #f43f5e 0%, #ec4899 100%) 1' }}
+                          transition={{ duration: 0.7, type: 'spring', stiffness: 400, damping: 10 }}
+                          className="flex items-center gap-2 mt-2 px-3 py-2 bg-gradient-to-r from-red-500/30 to-pink-500/30 border-2 border-transparent bg-clip-padding backdrop-blur-md rounded-xl text-red-500 text-sm shadow-xl ring-2 ring-red-400/30 animate-pulse"
+                          style={{ borderImage: 'linear-gradient(90deg, #f43f5e 0%, #ec4899 100%) 1', boxShadow: '0 0 16px 2px #f43f5e55' }}
                         >
-                          <svg className="w-5 h-5 text-red-400 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.2" fill="#fff3f3"/><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" /></svg>
+                          <motion.svg
+                            className="w-5 h-5 text-red-400 animate-bounce"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.2"
+                            viewBox="0 0 24 24"
+                            animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
+                            transition={{ duration: 0.7, repeat: Infinity, repeatType: 'loop' }}
+                          >
+                            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2.2" fill="#fff3f3" />
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01" />
+                          </motion.svg>
                           <span className="font-semibold drop-shadow">{errors.projectType}</span>
                         </motion.div>
                       )}
