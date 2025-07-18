@@ -137,7 +137,7 @@ const AnimeNavBar: React.FC<NavBarProps> = ({ items, isDark, onThemeToggle }) =>
           </div>
 
           {/* Hire Me Button */}
-          <Link to="/contact" className="ml-2">
+          <Link to="/services" className="ml-2">
             <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-5 py-2 rounded-full shadow transition-all duration-200">
               Hire Me
             </button>
