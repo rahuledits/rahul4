@@ -6,7 +6,7 @@ const PortfolioSection = () => {
   const portfolioCards = [
     {
       icon: <Film className="size-4 text-orange-300" />,
-      title: "Ethereal Love Story",
+      title: "Classroom Assignment",
       description: "Cinematic wedding storytelling",
       date: "Latest",
       iconClassName: "text-orange-500",

@@ -15,8 +15,8 @@ const Services = ({ isDark, onThemeToggle }) => {
     {
       name: "Basic Edit",
       icon: <Zap className="w-8 h-8" />,
-      priceUSD: "$19.99",
-      priceINR: "₹1,699",
+      priceUSD: "$24.99",
+      priceINR: "₹2,199",
       duration: "2-3 days",
       description: "Professional Adobe Premiere Pro editing for quality projects",
       features: [
@@ -35,8 +35,8 @@ const Services = ({ isDark, onThemeToggle }) => {
     {
       name: "Professional",
       icon: <Star className="w-8 h-8" />,
-      priceUSD: "$69.99",
-      priceINR: "₹5,999",
+      priceUSD: "$79.99",
+      priceINR: "₹6,999",
       duration: "3-5 days",
       description: "Premium Adobe After Effects & Premiere Pro mastery",
       features: [
@@ -56,8 +56,8 @@ const Services = ({ isDark, onThemeToggle }) => {
     {
       name: "Cinematic",
       icon: <Crown className="w-8 h-8" />,
-      priceUSD: "$149.99",
-      priceINR: "₹12,999",
+      priceUSD: "$169.99",
+      priceINR: "₹14,999",
       duration: "5-7 days",
       description: "Hollywood-grade post-production excellence",
       features: [
@@ -82,29 +82,29 @@ const Services = ({ isDark, onThemeToggle }) => {
       id: 'rushDelivery',
       title: "Rush Delivery",
       description: "Get your project completed in 24-48 hours",
-      priceUSD: "+40% of package price",
-      priceINR: "+40% of package price"
+      priceUSD: "+50% of package price",
+      priceINR: "+50% of package price"
     },
     {
       id: 'additionalRevisions',
       title: "Additional Revisions",
       description: "Beyond the included revisions",
-      priceUSD: "+15% of package price",
-      priceINR: "+15% of package price"
+      priceUSD: "+20% of package price",
+      priceINR: "+20% of package price"
     },
     {
       id: 'customMusic',
       title: "Custom Music",
       description: "Original soundtrack composition",
-      priceUSD: "+60% of package price",
-      priceINR: "+60% of package price"
+      priceUSD: "+70% of package price",
+      priceINR: "+70% of package price"
     },
     {
       id: 'extraFormats',
       title: "Extra Formats",
       description: "Multiple aspect ratios for different platforms",
-      priceUSD: "+20% of package price",
-      priceINR: "+20% of package price"
+      priceUSD: "+30% of package price",
+      priceINR: "+30% of package price"
     }
   ];
 

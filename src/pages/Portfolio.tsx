@@ -52,81 +52,99 @@ function launchConfetti(canvas) {
 
 const Portfolio = ({ isDark, onThemeToggle }) => {
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [videoDurations, setVideoDurations] = useState({});
+
+  const handleLoadedMetadata = (id, duration) => {
+    setVideoDurations(prev => ({ ...prev, [id]: duration }));
+  };
+
+  const formatDuration = (seconds) => {
+    if (!seconds) return '';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${s.toString().padStart(2, '0')}`;
+  };
   
-  const categories = ['All', 'Music Videos', 'Commercials', 'Weddings', 'Short Films'];
+  const categories = ['All', 'Educational', 'Commercials', 'Short Film', 'Corporate', 'Documentary'];
   
   const projects = [
     {
       id: 1,
-      title: "Ethereal Love Story",
-      category: "Weddings",
-      thumbnail: "https://images.unsplash.com/photo-1519741497674-611481863552?w=800&h=450&fit=crop",
-      duration: "3:45",
+      title: "Classroom Documentary",
+      category: "Educational",
+      thumbnail: "/thumbnails/d.jpg",
       date: "Dec 2024",
-      description: "A cinematic wedding film capturing the magical moments of Sarah & John's special day.",
-      tags: ["Cinematic", "Emotional", "4K"],
+      description: "A documentary-style classroom project highlighting teamwork, creativity, and the learning process. Shot and edited for maximum engagement and clarity.",
+      tags: ["Documentary", "Education", "Teamwork", "Storytelling"],
+      role: "Director, Editor",
+      tools: ["Premiere Pro", "After Effects", "DaVinci Resolve"],
       views: "12.5K",
-      video: "https://www.w3schools.com/html/mov_bbb.mp4"
+      video: "/d.mp4"
     },
     {
       id: 2,
-      title: "Urban Rhythms",
-      category: "Music Videos",
-      thumbnail: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=450&fit=crop",
-      duration: "4:12",
+      title: "Bike Commercial",
+      category: "Commercials",
+      thumbnail: "/thumbnails/b.jpg",
       date: "Nov 2024",
-      description: "High-energy music video with dynamic cuts and vibrant color grading.",
-      tags: ["Fast-paced", "Colorful", "Urban"],
+      description: "A high-energy bike commercial featuring dynamic action shots, fast-paced editing, and cinematic visuals to capture the thrill of the ride.",
+      tags: ["Bike", "Commercial", "Action", "Dynamic", "Cinematic"],
+      role: "Editor, Colorist",
+      tools: ["Premiere Pro", "After Effects"],
       views: "25.8K",
-      video: "/2.mp4"
+      video: "/b.mp4"
     },
     {
       id: 3,
-      title: "Brand Vision",
+      title: "Car Intro",
       category: "Commercials",
-      thumbnail: "https://images.unsplash.com/photo-1551434678-e076c223a692?w=800&h=450&fit=crop",
-      duration: "1:30",
+      thumbnail: "/thumbnails/car1.jpg",
       date: "Oct 2024",
-      description: "Corporate commercial showcasing innovative technology solutions.",
-      tags: ["Professional", "Clean", "Modern"],
+      description: "A cinematic car introduction commercial with sleek visuals, dynamic camera moves, and a powerful sense of speed and innovation.",
+      tags: ["Car", "Commercial", "Intro", "Cinematic", "Automotive"],
+      role: "Editor, Motion Designer",
+      tools: ["Premiere Pro", "After Effects", "Cinema 4D"],
       views: "8.3K",
-      video: "https://www.w3schools.com/html/movie.mp4"
+      video: "/car1.mp4"
     },
     {
       id: 4,
       title: "Midnight Dreams",
-      category: "Short Films",
-      thumbnail: "https://images.unsplash.com/photo-1489599735036-ad5877043088?w=800&h=450&fit=crop",
-      duration: "8:22",
+      category: "Short Film",
+      thumbnail: "/thumbnails/car2.jpg",
       date: "Sep 2024",
-      description: "A psychological thriller exploring the boundaries between dreams and reality.",
-      tags: ["Thriller", "Atmospheric", "Suspense"],
+      description: "A psychological thriller short film exploring the boundaries between dreams and reality, with atmospheric visuals and suspenseful editing.",
+      tags: ["Thriller", "Short Film", "Atmospheric", "Suspense"],
+      role: "Director, Editor",
+      tools: ["Premiere Pro", "DaVinci Resolve"],
       views: "18.7K",
-      video: "https://www.w3schools.com/html/mov_bbb.mp4"
+      video: "/car2.mp4"
     },
     {
       id: 5,
-      title: "Golden Hour",
-      category: "Music Videos",
-      thumbnail: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=800&h=450&fit=crop",
-      duration: "3:28",
+      title: "Talking Head Interview",
+      category: "Corporate",
+      thumbnail: "/thumbnails/car.jpg",
       date: "Aug 2024",
-      description: "Romantic indie music video shot during golden hour with natural lighting.",
-      tags: ["Natural", "Romantic", "Indie"],
+      description: "A professional talking head video with crisp studio lighting, engaging delivery, and dynamic motion graphics to highlight key points.",
+      tags: ["Talking Head", "Motion Graphics", "Professional", "Interview", "Studio"],
+      role: "Editor, Motion Designer",
+      tools: ["Premiere Pro", "After Effects"],
       views: "31.2K",
-      video: "/2.mp4"
+      video: "/car.mp4"
     },
     {
       id: 6,
-      title: "Tech Innovation",
-      category: "Commercials",
-      thumbnail: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&h=450&fit=crop",
-      duration: "2:15",
+      title: "Kashi: The Eternal City",
+      category: "Documentary",
+      thumbnail: "/thumbnails/2.jpg",
       date: "Jul 2024",
-      description: "Product launch video featuring cutting-edge technology and sleek design.",
-      tags: ["Tech", "Sleek", "Futuristic"],
+      description: "A spiritual and cultural documentary exploring the timeless city of Kashi (Varanasi), its rituals, people, and the sacred Ganges.",
+      tags: ["Kashi", "Spiritual", "Culture", "Documentary", "India"],
+      role: "Director, Editor, Cinematographer",
+      tools: ["Premiere Pro", "DaVinci Resolve", "Sony A7III"],
       views: "15.4K",
-      video: "https://www.w3schools.com/html/movie.mp4"
+      video: "/2.mp4"
     }
   ];
 
@@ -145,6 +163,7 @@ const Portfolio = ({ isDark, onThemeToggle }) => {
   });
   const [discountCode, setDiscountCode] = useState('');
   const suspenseTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [videoEndedId, setVideoEndedId] = useState(null);
 
   const generateRandomCode = () => {
     const prefixes = ['DARK', 'FORBIDDEN', 'MYSTERY', 'SECRET', 'HIDDEN', 'CURSED', 'SHADOW', 'NIGHT'];
@@ -246,11 +265,11 @@ const Portfolio = ({ isDark, onThemeToggle }) => {
                 key={category}
                 variant={selectedCategory === category ? "default" : "outline"}
                 onClick={() => setSelectedCategory(category)}
-                className={`${
-                  selectedCategory === category 
+                className={`$
+                  {selectedCategory === category 
                     ? "bg-gradient-to-r from-orange-500 to-pink-500 border-0" 
                     : "border-white/20 bg-white/5 hover:bg-white/10"
-                } transition-all duration-300`}
+                  } transition-all duration-300`}
               >
                 {category}
               </Button>
@@ -279,7 +298,6 @@ const Portfolio = ({ isDark, onThemeToggle }) => {
                       className="w-full aspect-video flex items-center justify-center relative group"
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ duration: 0.5 }}
                       layout
                     >
                       {/* Static subtle border shadow */}
@@ -288,7 +306,7 @@ const Portfolio = ({ isDark, onThemeToggle }) => {
                       <div className="absolute inset-0 z-0 rounded-xl bg-white/5" />
                       {/* Close button with lighter animation */}
                       <button
-                        onClick={() => setPlayingProjectId(null)}
+                        onClick={() => { setPlayingProjectId(null); setVideoEndedId(null); }}
                         className="absolute top-2 right-2 z-30 bg-black/60 hover:bg-orange-500 text-white rounded-full p-2 shadow-md transition-all duration-150 focus:outline-none scale-100 hover:scale-110"
                         aria-label="Close video"
                       >
@@ -301,9 +319,27 @@ const Portfolio = ({ isDark, onThemeToggle }) => {
                         src={project.video}
                         autoPlay
                         controls
+                        poster={project.thumbnail}
                         className="w-full h-full object-contain bg-black rounded-xl border-4 border-orange-500 shadow-lg transition-all duration-300 mx-auto min-h-[300px] md:min-h-[400px] lg:min-h-[500px] z-20"
-                        onEnded={() => setPlayingProjectId(null)}
+                        onEnded={() => setVideoEndedId(project.id)}
+                        id={`video-${project.id}`}
                       />
+                      {/* Watch Again Button */}
+                      {videoEndedId === project.id && (
+                        <button
+                          className="absolute left-1/2 bottom-1/2 z-40 -translate-x-1/2 translate-y-1/2 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-bold px-8 py-4 rounded-full shadow-lg animate-bounce"
+                          onClick={() => {
+                            const vid = document.getElementById(`video-${project.id}`) as HTMLVideoElement;
+                            if (vid) {
+                              vid.currentTime = 0;
+                              vid.play();
+                            }
+                            setVideoEndedId(null);
+                          }}
+                        >
+                          <span className="text-2xl">🔁</span> Watch Again
+                        </button>
+                      )}
                       {/* Project title overlay */}
                       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-30 px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-500/90 to-pink-500/90 text-white font-semibold text-base shadow-md animate-fade-in-up">
                         {project.title}
@@ -327,7 +363,12 @@ const Portfolio = ({ isDark, onThemeToggle }) => {
                         </Button>
                       </div>
                       <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm rounded-full px-3 py-1 text-white text-sm">
-                        {project.duration}
+                        {videoDurations[project.id] ? formatDuration(videoDurations[project.id]) : ''}
+                        <video
+                          src={project.video}
+                          style={{ display: 'none' }}
+                          onLoadedMetadata={e => handleLoadedMetadata(project.id, (e.target as HTMLVideoElement).duration)}
+                        />
                       </div>
                     </>
                   )}
@@ -347,7 +388,7 @@ const Portfolio = ({ isDark, onThemeToggle }) => {
                     <div className="ml-2 px-3 py-1 rounded-full bg-black/30 text-white text-xs font-semibold">
                       {isIndia
                         ? (project.id === 1 ? '$15' : project.id === 2 ? '$25' : project.id === 3 ? '$50' : '$25')
-                        : (project.price || '$69')}
+                        : '$69'}
                     </div>
                   </div>
                   
@@ -367,6 +408,14 @@ const Portfolio = ({ isDark, onThemeToggle }) => {
                       >
                         {tag}
                       </span>
+                    ))}
+                  </div>
+                  {/* Role and Tools Used */}
+                  <div className="flex flex-wrap items-center gap-2 mb-4">
+                    <span className="text-xs font-semibold text-orange-400 bg-orange-900/20 px-2 py-1 rounded-full">Role: {project.role}</span>
+                    <span className="text-xs font-semibold text-blue-400 bg-blue-900/20 px-2 py-1 rounded-full">Tools:</span>
+                    {project.tools && project.tools.map((tool) => (
+                      <span key={tool} className="text-xs bg-white/10 text-blue-200 px-2 py-1 rounded-full border border-blue-400/20">{tool}</span>
                     ))}
                   </div>
 

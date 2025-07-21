@@ -45,7 +45,7 @@ const TestimonialsSection = () => {
   }];
 
   return (
-    <section id="testimonials" className="py-32 px-4 relative overflow-hidden">
+    <section id="testimonials" className="py-16 sm:py-32 px-2 sm:px-4 relative overflow-x-hidden w-full">
       {/* Animated Background Sparkles */}
       <div className="absolute inset-0">
         <SparklesCore 
@@ -58,11 +58,10 @@ const TestimonialsSection = () => {
           speed={1.2}
         />
       </div>
-
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto relative z-10 w-full">
         {/* Enhanced Header */}
         <motion.div 
-          className="text-center mb-20"
+          className="text-center mb-10 sm:mb-20"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -85,9 +84,8 @@ const TestimonialsSection = () => {
             <span className="text-sm font-medium text-blue-300">Client Testimonials</span>
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
           </motion.div>
-
           <motion.h2 
-            className="text-4xl md:text-6xl font-bold mb-6 text-gray-900 dark:text-white"
+            className="text-2xl sm:text-4xl md:text-6xl font-bold mb-6 text-gray-900 dark:text-white"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
@@ -95,9 +93,8 @@ const TestimonialsSection = () => {
           >
             Trusted by Industry Leaders
           </motion.h2>
-          
           <motion.p 
-            className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed"
+            className="text-base sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
@@ -105,10 +102,9 @@ const TestimonialsSection = () => {
           >
             Professional feedback from executives and decision-makers who have experienced our video editing expertise
           </motion.p>
-
           {/* Professional Stats */}
           <motion.div 
-            className="flex justify-center items-center gap-8 mt-8"
+            className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 mt-8"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.5 }}
@@ -118,19 +114,18 @@ const TestimonialsSection = () => {
               <Award className="h-4 w-4 text-blue-400" />
               <span>150+ Enterprise Clients</span>
             </div>
-            <div className="w-px h-4 bg-gray-300 dark:bg-gray-600" />
+            <div className="hidden sm:block w-px h-4 bg-gray-300 dark:bg-gray-600" />
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <Zap className="h-4 w-4 text-indigo-400" />
               <span>99.8% Success Rate</span>
             </div>
-            <div className="w-px h-4 bg-gray-300 dark:bg-gray-600" />
+            <div className="hidden sm:block w-px h-4 bg-gray-300 dark:bg-gray-600" />
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <Quote className="h-4 w-4 text-blue-400" />
               <span>Industry Recognition</span>
             </div>
           </motion.div>
         </motion.div>
-
         {/* Enhanced Carousel */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
@@ -141,16 +136,16 @@ const TestimonialsSection = () => {
           <Carousel className="w-full max-w-6xl mx-auto">
             <CarouselContent>
               {testimonials.map((testimonial, index) => (
-                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={index} className="w-full sm:md:basis-1/2 lg:basis-1/3 flex justify-center">
                   <motion.div 
-                    className="p-4"
+                    className="p-2 sm:p-4 w-full max-w-md"
                     initial={{ opacity: 0, scale: 0.8 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.6, delay: index * 0.1 }}
                     viewport={{ once: true }}
                     whileHover={{ y: -10 }}
                   >
-                    <div className="bg-white dark:bg-gray-800/50 backdrop-blur-xl rounded-2xl p-8 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2 h-full relative overflow-hidden">
+                    <div className="bg-white dark:bg-gray-800/50 backdrop-blur-xl rounded-2xl p-4 sm:p-8 border border-gray-200 dark:border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105 group-hover:-translate-y-2 h-full relative overflow-hidden">
                       {/* Professional Quote Icon */}
                       <motion.div
                         className="absolute top-6 right-6 opacity-5 group-hover:opacity-10 transition-opacity"
@@ -159,7 +154,6 @@ const TestimonialsSection = () => {
                       >
                         <Quote className="h-20 w-20 text-blue-400" />
                       </motion.div>
-
                       {/* Rating Stars */}
                       <div className="flex items-center gap-1 mb-6">
                         {[...Array(5)].map((_, i) => (
@@ -174,12 +168,10 @@ const TestimonialsSection = () => {
                           </motion.div>
                         ))}
                       </div>
-
                       <div className="flex flex-col h-full relative z-10">
-                        <blockquote className="text-gray-700 dark:text-gray-300 flex-grow text-lg leading-relaxed mb-8 font-medium">
+                        <blockquote className="text-gray-700 dark:text-gray-300 flex-grow text-base sm:text-lg leading-relaxed mb-6 sm:mb-8 font-medium">
                           "{testimonial.quote}"
                         </blockquote>
-                        
                         <div className="flex items-center">
                           <motion.div
                             className="relative"
@@ -189,15 +181,15 @@ const TestimonialsSection = () => {
                             <img
                               src={testimonial.src}
                               alt={testimonial.name}
-                              className="w-16 h-16 rounded-full object-cover mr-4 border-2 border-blue-400/30"
+                              className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover mr-2 sm:mr-4 border-2 border-blue-400/30"
                             />
                             {/* Professional glow effect */}
                             <div className="absolute inset-0 rounded-full bg-blue-400/10 blur-md scale-110" />
                           </motion.div>
                           <div className="flex-1">
-                            <h4 className="font-bold text-gray-900 dark:text-white text-lg">{testimonial.name}</h4>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 font-semibold">{testimonial.designation}</p>
-                            <p className="text-sm text-gray-500 dark:text-gray-500">{testimonial.company}</p>
+                            <h4 className="font-bold text-gray-900 dark:text-white text-base sm:text-lg">{testimonial.name}</h4>
+                            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-semibold">{testimonial.designation}</p>
+                            <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-500">{testimonial.company}</p>
                             <p className="text-xs text-gray-400 dark:text-gray-600">{testimonial.location}</p>
                             <div className="flex items-center gap-1 mt-2">
                               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
@@ -206,7 +198,6 @@ const TestimonialsSection = () => {
                           </div>
                         </div>
                       </div>
-
                       {/* Professional Hover Effects */}
                       <motion.div
                         className="absolute inset-0 bg-gradient-to-r from-blue-500/5 to-indigo-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl"
@@ -217,23 +208,21 @@ const TestimonialsSection = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            
             {/* Enhanced Carousel Controls */}
             <CarouselPrevious className="text-gray-900 dark:text-white border-gray-300 dark:border-white/30 hover:bg-gray-100 dark:hover:bg-white/10 hover:scale-110 transition-transform" />
             <CarouselNext className="text-gray-900 dark:text-white border-gray-300 dark:border-white/30 hover:bg-gray-100 dark:hover:bg-white/10 hover:scale-110 transition-transform" />
           </Carousel>
         </motion.div>
-
         {/* Professional CTA */}
         <motion.div
-          className="text-center mt-16"
+          className="text-center mt-10 sm:mt-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.8 }}
           viewport={{ once: true }}
         >
           <motion.div
-            className="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-gradient-to-r from-blue-500/10 to-indigo-500/10 backdrop-blur-sm border border-blue-500/20"
+            className="inline-flex items-center gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-gradient-to-r from-blue-500/10 to-indigo-500/10 backdrop-blur-sm border border-blue-500/20"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >

@@ -57,7 +57,7 @@ export default function Navigation({ isDark, onThemeToggle }: NavigationProps) {
   };
 
   return (
-    <nav className={`fixed top-0 left-1/2 -translate-x-1/2 z-50 w-screen max-w-none rounded-2xl shadow-2xl px-4 sm:px-8 md:px-12 py-2 sm:py-3 flex items-center justify-between backdrop-blur-xl transition-all duration-300 ease-in-out ${
+    <nav className={`fixed top-0 left-1/2 -translate-x-1/2 z-50 w-full max-w-none rounded-2xl shadow-2xl px-2 sm:px-4 md:px-12 py-2 sm:py-3 flex items-center justify-between backdrop-blur-xl transition-all duration-300 ease-in-out overflow-x-hidden ${
       isVisible ? 'translate-y-0' : '-translate-y-full'
     } ${
       isDark 
@@ -92,11 +92,11 @@ export default function Navigation({ isDark, onThemeToggle }: NavigationProps) {
       </motion.div>
       {/* Hamburger for mobile */}
       <button
-        className="sm:hidden p-2 ml-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+        className="sm:hidden p-3 ml-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 min-w-[44px] min-h-[44px] flex items-center justify-center"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
       >
-        {mobileMenuOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+        {mobileMenuOpen ? <X className="w-8 h-8" /> : <Menu className="w-8 h-8" />}
       </button>
       {/* Navigation Links - Desktop */}
       <div className="hidden sm:flex gap-2 md:gap-4 lg:gap-8 items-center">
@@ -113,6 +113,7 @@ export default function Navigation({ isDark, onThemeToggle }: NavigationProps) {
                   ? "text-white/80 hover:text-white hover:bg-white/10"
                   : "text-gray-700 hover:text-gray-900 hover:bg-gray-100/50"
             }`}
+            style={{ minHeight: '44px', minWidth: '44px' }}
           >
             {item.name}
           </Link>
@@ -123,52 +124,39 @@ export default function Navigation({ isDark, onThemeToggle }: NavigationProps) {
         <div className="flex items-center gap-2 md:gap-3">
           <button
             onClick={onThemeToggle}
-            className={`p-2 rounded-lg transition-all duration-200 drop-shadow-sm ${
+            className={`p-3 rounded-lg transition-all duration-200 drop-shadow-sm min-w-[44px] min-h-[44px] flex items-center justify-center ${
               isDark 
                 ? 'bg-white/10 hover:bg-white/20 text-white' 
                 : 'bg-gray-900/10 hover:bg-gray-900/20 text-gray-700'
             }`}
+            aria-label="Toggle theme"
           >
             {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
         </div>
-        <MediaButton label="Hire Me" mediaUrl="/font/F.gif" />
       </div>
-      {/* Mobile Menu */}
+      {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
-        <div className={`sm:hidden absolute top-full left-0 w-full bg-white dark:bg-black/90 border-t border-gray-200 dark:border-white/10 shadow-xl rounded-b-2xl z-40 flex flex-col items-center py-4 gap-2 animate-fade-in`}> 
-          {navItems.map((item) => (
-            <Link
-              key={item.name}
-              to={item.url}
-              className={`w-11/12 text-center px-4 py-4 rounded-lg font-semibold text-lg transition-colors duration-200 drop-shadow-sm ${
-                location.pathname === item.url 
-                  ? isDark 
-                    ? "bg-white/20 shadow-md text-white" 
-                    : "bg-gray-900/10 shadow-md text-gray-900"
-                  : isDark
-                    ? "text-white/80 hover:text-white hover:bg-white/10"
-                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-100/50"
-              }`}
-              style={{ minHeight: 44 }}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {item.name}
-            </Link>
-          ))}
-          <div className="flex items-center gap-4 mt-4">
+        <div className="fixed inset-0 z-50 bg-black/60 flex flex-col items-center justify-center sm:hidden" onClick={() => setMobileMenuOpen(false)}>
+          <div className="bg-white dark:bg-black rounded-2xl shadow-2xl p-8 w-11/12 max-w-xs flex flex-col gap-6 items-center" onClick={e => e.stopPropagation()}>
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.url}
+                className="w-full text-center py-4 text-lg font-semibold rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 transition-all"
+                style={{ minHeight: '48px' }}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {item.name}
+              </Link>
+            ))}
             <button
               onClick={onThemeToggle}
-              className={`p-2 rounded-lg transition-all duration-200 drop-shadow-sm ${
-                isDark 
-                  ? 'bg-white/10 hover:bg-white/20 text-white' 
-                  : 'bg-gray-900/10 hover:bg-gray-900/20 text-gray-700'
-              }`}
-              style={{ minWidth: 44, minHeight: 44 }}
+              className="w-full py-4 text-lg font-semibold rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 text-white mt-2"
+              style={{ minHeight: '48px' }}
             >
-              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {isDark ? 'Light Mode' : 'Dark Mode'}
             </button>
-            <MediaButton label="Hire Me" mediaUrl="/font/F.gif" />
           </div>
         </div>
       )}
