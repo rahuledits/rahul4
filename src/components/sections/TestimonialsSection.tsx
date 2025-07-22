@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { GlareCard } from "@/components/ui/glare-card";
@@ -44,6 +44,15 @@ const TestimonialsSection = () => {
     src: "/5t.jpeg"
   }];
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
   return (
     <section id="testimonials" className="py-16 sm:py-32 px-2 sm:px-4 relative overflow-x-hidden w-full">
       {/* Animated Background Sparkles */}
@@ -52,10 +61,10 @@ const TestimonialsSection = () => {
           background="transparent"
           minSize={0.3}
           maxSize={1.2}
-          particleDensity={80}
+          particleDensity={isMobile ? 10 : 80}
           className="w-full h-full"
           particleColor="#f97316"
-          speed={1.2}
+          speed={isMobile ? 0.5 : 1.2}
         />
       </div>
       <div className="max-w-7xl mx-auto relative z-10 w-full">
@@ -64,7 +73,7 @@ const TestimonialsSection = () => {
           className="text-center mb-10 sm:mb-20"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: isMobile ? 0 : 0.8 }}
           viewport={{ once: true }}
         >
           {/* Professional Badge */}
@@ -72,7 +81,7 @@ const TestimonialsSection = () => {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500/20 to-indigo-500/20 backdrop-blur-sm border border-blue-500/30 mb-6"
             initial={{ scale: 0, rotate: -180 }}
             whileInView={{ scale: 1, rotate: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: isMobile ? 0 : 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
             <motion.div
@@ -88,7 +97,7 @@ const TestimonialsSection = () => {
             className="text-2xl sm:text-4xl md:text-6xl font-bold mb-6 text-gray-900 dark:text-white"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
+            transition={{ duration: isMobile ? 0 : 0.8, delay: 0.3 }}
             viewport={{ once: true }}
           >
             Trusted by Industry Leaders
@@ -97,7 +106,7 @@ const TestimonialsSection = () => {
             className="text-base sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: isMobile ? 0 : 0.8, delay: 0.4 }}
             viewport={{ once: true }}
           >
             Professional feedback from executives and decision-makers who have experienced our video editing expertise
@@ -107,7 +116,7 @@ const TestimonialsSection = () => {
             className="flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-8 mt-8"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
+            transition={{ duration: isMobile ? 0 : 0.8, delay: 0.5 }}
             viewport={{ once: true }}
           >
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
@@ -130,7 +139,7 @@ const TestimonialsSection = () => {
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
+          transition={{ duration: isMobile ? 0 : 0.8, delay: 0.6 }}
           viewport={{ once: true }}
         >
           <Carousel className="w-full max-w-6xl mx-auto">
@@ -141,7 +150,7 @@ const TestimonialsSection = () => {
                     className="p-2 sm:p-4 w-full max-w-md"
                     initial={{ opacity: 0, scale: 0.8 }}
                     whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    transition={{ duration: isMobile ? 0 : 0.6, delay: index * 0.1 }}
                     viewport={{ once: true }}
                     whileHover={{ y: -10 }}
                   >
@@ -150,7 +159,7 @@ const TestimonialsSection = () => {
                       <motion.div
                         className="absolute top-6 right-6 opacity-5 group-hover:opacity-10 transition-opacity"
                         animate={{ rotate: [0, 2, -2, 0] }}
-                        transition={{ duration: 6, repeat: Infinity }}
+                        transition={{ duration: isMobile ? 0 : 6, repeat: Infinity }}
                       >
                         <Quote className="h-20 w-20 text-blue-400" />
                       </motion.div>
@@ -218,7 +227,7 @@ const TestimonialsSection = () => {
           className="text-center mt-10 sm:mt-16"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8 }}
+          transition={{ duration: isMobile ? 0 : 0.8, delay: 0.8 }}
           viewport={{ once: true }}
         >
           <motion.div

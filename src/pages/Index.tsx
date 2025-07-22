@@ -112,10 +112,6 @@ const Index = ({ isDark, onThemeToggle }: IndexProps) => {
             </Link>
           </div>
         </div>
-        {/* Services Section */}
-        <div className="relative z-30">
-          <ServicesSection isDarkMode={isDarkMode} />
-        </div>
 
         {/* Pricing Section */}
         <section id="pricing" className="py-20 relative z-30">

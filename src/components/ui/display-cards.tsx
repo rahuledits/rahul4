@@ -10,7 +10,8 @@ interface DisplayCardProps {
   date?: string;
   iconClassName?: string;
   titleClassName?: string;
-  backgroundImage?: string;
+  video?: string;
+  thumbnail?: string;
 }
 export function DisplayCard({
   className,
@@ -20,17 +21,24 @@ export function DisplayCard({
   date = "Just now",
   iconClassName = "text-blue-500",
   titleClassName = "text-blue-500",
-  backgroundImage
+  video,
+  thumbnail
 }: DisplayCardProps) {
   return <div 
     className={cn("relative flex flex-col justify-between rounded-xl border-2 bg-muted/70 backdrop-blur-sm px-4 py-4 sm:py-3 transition-all duration-700 w-full max-w-xs sm:w-[22rem] -skew-y-[8deg] select-none my-4 mx-auto shadow-lg after:absolute after:-right-1 after:top-[-5%] after:h-[110%] after:w-[20rem] after:bg-gradient-to-l after:from-background after:to-transparent after:content-[''] hover:border-white/20 hover:bg-muted [&>*]:flex [&>*]:items-center [&>*]:gap-2", className)}
-    style={backgroundImage ? {
-      backgroundImage: `url(${backgroundImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat'
-    } : undefined}
   >
+    {video && thumbnail ? (
+      <video
+        src={video}
+        poster={thumbnail}
+        muted
+        loop
+        playsInline
+        autoPlay
+        className="absolute inset-0 w-full h-full object-cover rounded-xl"
+      />
+    ) : null}
+    <div className="relative z-10 bg-black/30 backdrop-blur-sm p-4 rounded-lg w-full">
       <div>
         <span className="relative inline-block rounded-full bg-blue-800 p-1">
           {icon}
@@ -39,6 +47,7 @@ export function DisplayCard({
       </div>
       <p className="whitespace-normal text-base sm:text-lg">{description}</p>
       <p className="text-muted-foreground text-sm sm:text-base">{date}</p>
+    </div>
     </div>;
 }
 interface DisplayCardsProps {

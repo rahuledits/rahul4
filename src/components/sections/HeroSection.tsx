@@ -66,24 +66,16 @@ const HeroSection = ({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  const InteractiveRobotSpline = lazy(() => import("@/components/ui/interactive-3d-robot").then(m => ({ default: m.InteractiveRobotSpline })));
+  const InteractiveRobotSplineLazy = lazy(() => import("@/components/ui/interactive-3d-robot").then(m => ({ default: m.InteractiveRobotSpline })));
 
   return (
     <section id="home" className="relative min-h-screen flex flex-col items-center overflow-x-hidden w-full px-2 sm:px-0">
-      {/* Unified Site Background for all devices, matching About page */}
       {isMobile ? (
-        <div className="absolute inset-0 z-0 bg-gradient-to-br from-orange-100 via-orange-200 to-indigo-200">
-          {/* Static Infinity Lines SVG overlay for mobile */}
-          <svg width="100%" height="100%" viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0 w-full h-full opacity-30 pointer-events-none">
-            <path d="M20,100 Q100,10 200,100 T380,100" stroke="#a78bfa" strokeWidth="2" fill="none" />
-            <path d="M20,120 Q100,30 200,120 T380,120" stroke="#f472b6" strokeWidth="1.5" fill="none" />
-            <path d="M20,80 Q100,170 200,80 T380,80" stroke="#38bdf8" strokeWidth="1" fill="none" />
-          </svg>
-        </div>
+        <div className="absolute inset-0 z-0 bg-black" />
       ) : (
         <SiteBackground 
           isDarkMode={isDarkMode} 
-          showRobot={false} 
+          showRobot={true} 
           showInfinityLines={true}
           sparkleDensity={120}
           sparkleColor="#8b5cf6"
@@ -96,7 +88,8 @@ const HeroSection = ({
           initial={{ opacity: 0, y: -40, scale: 0.7 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 1.2, ease: "easeOut" }}
-          className="text-3xl xs:text-4xl sm:text-6xl md:text-8xl lg:text-[6rem] font-bold tracking-tighter bg-gradient-to-br from-red-800 via-red-500 to-orange-400 bg-clip-text text-transparent drop-shadow-2xl hero-star-dock whitespace-nowrap px-1 sm:px-2 text-center"
+          className="text-5xl sm:text-6xl md:text-8xl lg:text-[6rem] font-bold tracking-tighter bg-gradient-to-br from-red-800 via-red-500 to-orange-400 bg-clip-text text-transparent drop-shadow-2xl hero-star-dock whitespace-nowrap px-1 sm:px-2 text-center flex items-center justify-center min-h-[60vh]"
+          style={{ minHeight: '60vh', alignItems: 'center', justifyContent: 'center', display: 'flex' }}
         >
           {"RAHUL".split("").map((letter, i) => (
             <motion.span
@@ -136,7 +129,7 @@ const HeroSection = ({
         <div className="absolute z-10 w-full h-full pointer-events-none">
           <div className="hidden sm:block absolute inset-0">
             <Suspense fallback={null}>
-              <InteractiveRobotSpline scene={ROBOT_SCENE_URL} className="w-full h-full" />
+              <InteractiveRobotSplineLazy scene={ROBOT_SCENE_URL} className="w-full h-full" />
             </Suspense>
           </div>
         </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 export const SocialRevealLinks = () => {
@@ -23,6 +23,29 @@ interface FlipLinkProps {
 }
 
 const FlipLink = ({ children, href }: FlipLinkProps) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  if (isMobile) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block text-4xl font-black uppercase text-white/80 hover:text-white transition-colors"
+        style={{ lineHeight: 0.75 }}
+      >
+        {children}
+      </a>
+    );
+  }
+
   return (
     <motion.a
       initial="initial"
